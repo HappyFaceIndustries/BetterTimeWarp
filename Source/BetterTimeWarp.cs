@@ -339,7 +339,11 @@ namespace BetterTimeWarp
 			{
 				string name = node.GetValue ("name");
 				bool physics = bool.Parse (node.GetValue("physics"));
-				float[] rates = new float[8];
+				float[] rates;
+				if (physics)
+					rates = new float[4];
+				else
+					rates = new float[8];
 				rates [0] = 1f;
 				rates [1] = float.Parse(node.GetValue ("warpRate1"));
 				rates [2] = float.Parse(node.GetValue ("warpRate2"));
