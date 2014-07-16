@@ -20,6 +20,7 @@ namespace BetterTimeWarp
 
 		public TimeWarp timeWarp;
 		public List<TimeWarpRates> customWarps = new List<TimeWarpRates> ();
+		public static bool ShowUI = true;
 
 		Texture2D upArrow;
 		Texture2D downArrow;
@@ -76,16 +77,19 @@ namespace BetterTimeWarp
 		bool windowOpen = false;
 		public void OnGUI()
 		{
-			GUI.skin = skin;
-
-			windowOpen = GUI.Toggle (new Rect(timeWarp.timeQuadrantTab.renderer.material.mainTexture.width - 55f, 0f, 20f, 20f), windowOpen, buttonContent, skin.button);
-			if (windowOpen)
+			if (ShowUI)
 			{
-				windowRect = GUI.Window (60371, windowRect, TimeWarpWindow, "Better Time Warp");
-				buttonContent = upContent;
+				GUI.skin = skin;
+
+				windowOpen = GUI.Toggle (new Rect (timeWarp.timeQuadrantTab.renderer.material.mainTexture.width - 55f, 0f, 20f, 20f), windowOpen, buttonContent, skin.button);
+				if (windowOpen)
+				{
+					windowRect = GUI.Window (60371, windowRect, TimeWarpWindow, "Better Time Warp");
+					buttonContent = upContent;
+				}
+				else
+					buttonContent = downContent;
 			}
-			else
-				buttonContent = downContent;
 		}
 
 		bool editToggle = false;
@@ -182,19 +186,6 @@ namespace BetterTimeWarp
 						editToggle = false;
 						SetWarpRates (timeWarpRates);
 						PopupDialog.SpawnPopupDialog ("Better Time Warp", "Custom warp rates saved, you may now access them from any save", "Ok", true, skin);
-						warpName = "Name";
-						physics = false;
-						w1 = "10";
-						w2 = "100";
-						w3 = "1000";
-						w4 = "10000";
-						w5 = "100000";
-						w6 = "1000000";
-						w7 = "10000000";
-					}
-					else
-					{
-						PopupDialog.SpawnPopupDialog ("Better Time Warp", "Cannot save custom warp rates because some variables are invalid", "Ok", true, skin);
 						warpName = "Name";
 						physics = false;
 						w1 = "10";
@@ -468,6 +459,8 @@ namespace BetterTimeWarp
 			BetterTimeWarp.SettingsNode.Save (KSPUtil.ApplicationRootPath + "GameData/BetterTimeWarp/Settings.cfg");
 
 			GameEvents.onGameStateSaved.Add (SaveSettings);
+			GameEvents.onShowUI.Add (ShowUI);
+			GameEvents.onHideUI.Add (HideUI);
 
 			foreach (CelestialBody body in FlightGlobals.Bodies)
 			{
@@ -482,6 +475,14 @@ namespace BetterTimeWarp
 			BetterTimeWarp.SettingsNode.Save (KSPUtil.ApplicationRootPath + "GameData/BetterTimeWarp/Settings.cfg");
 			Debug.Log ("[BetterTimeWarp]: Settings saved");
 			BetterTimeWarp.SettingsNode = ConfigNode.Load (KSPUtil.ApplicationRootPath + "GameData/BetterTimeWarp/Settings.cfg");
+		}
+		void ShowUI()
+		{
+			BetterTimeWarp.ShowUI = true;
+		}
+		void HideUI()
+		{
+			BetterTimeWarp.ShowUI = false;
 		}
 	}
 }
