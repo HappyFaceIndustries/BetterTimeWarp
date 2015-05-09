@@ -1,11 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Linq;
-using System.Text;
 using UnityEngine;
-using KSP;
-using System.IO;
 
 namespace BetterTimeWarp
 {
@@ -47,20 +42,19 @@ namespace BetterTimeWarp
 			customWarps.Add (StandardWarp);
 			customWarps.Add (StandardPhysWarp);
 			LoadCustomWarpRates ();
-			SetWarpRates (StandardWarp);
-			SetWarpRates (StandardPhysWarp);
+			SetWarpRates (StandardWarp, false);
+			SetWarpRates (StandardPhysWarp, false);
 
-			windowRect = new Rect(timeWarp.timeQuadrantTab.renderer.material.mainTexture.width - 55f, 20f, 500f, 500f);
+			windowRect = new Rect(timeWarp.timeQuadrantTab.renderer.material.mainTexture.width - 55f, 20f, 400f, 400f);
 			SaveRectValue ();
 			LoadRectValue ();
 
-			upArrow = new Texture2D (4, 4, TextureFormat.RGBA32, false);
-			downArrow = new Texture2D (4, 4, TextureFormat.RGBA32, false);
-			upArrow.LoadImage (System.IO.File.ReadAllBytes ("GameData/BetterTimeWarp/PluginData/BetterTimeWarp/up.png"));
-			downArrow.LoadImage (System.IO.File.ReadAllBytes ("GameData/BetterTimeWarp/PluginData/BetterTimeWarp/down.png"));
+			upArrow = GameDatabase.Instance.GetTexture ("BetterTimeWarp/Icons/up", false);
+			downArrow = GameDatabase.Instance.GetTexture ("BetterTimeWarp/Icons/down", false);
 
 			upContent = new GUIContent ("", upArrow, "");
 			downContent = new GUIContent ("", downArrow, "");
+			buttonContent = downContent;
 		}
 		private void Update()
 		{
@@ -73,7 +67,7 @@ namespace BetterTimeWarp
 		GUIContent buttonContent;
 		GUIContent upContent;
 		GUIContent downContent;
-		
+
 		bool windowOpen = false;
 		public void OnGUI()
 		{
@@ -108,15 +102,49 @@ namespace BetterTimeWarp
 		TimeWarpRates currentRates = StandardWarp;
 		int selected = 0;
 
+		TimeWarpRates CurrentWarp;
+		TimeWarpRates CurrentPhysWarp;
+
 		public void TimeWarpWindow(int id)
 		{
-			GUILayout.BeginHorizontal ();
-			GUILayout.BeginVertical ();
 			GUILayout.Space (10f);
 
-			editToggle = GUILayout.Toggle (editToggle, "Create Custom Time Warp", skin.button);
+			GUILayout.BeginHorizontal ();
+			GUILayout.BeginVertical ();
+
+			scrollPos = GUILayout.BeginScrollView (scrollPos);
+			List<string> names = new List<string> ();
+			foreach (var rates in customWarps)
+			{
+				string sB = "";
+				string sA = "";
+				if (rates == CurrentWarp || rates == CurrentPhysWarp)
+				{
+					sB = "<color=lime>";
+					sA = "</color>";
+				}
+				if (rates == currentRates)
+				{
+					sB = "<color=orange>";
+					sA = "</color>";
+				}
+
+				names.Add (sB + rates.Name + sA);
+			}
+			editToggle = GUILayout.Toggle (editToggle, "Create", skin.button);
+			GUILayout.Space (10f);
+			selected = GUILayout.SelectionGrid (selected, names.ToArray(), 1);
+			currentRates = customWarps [selected];
+			GUILayout.EndScrollView ();
+
+			GUILayout.EndVertical ();
+
+			GUILayout.BeginVertical ();
+
 			if (editToggle)
 			{
+				GUILayout.BeginVertical (skin.box);
+
 				bool canExport = true;
 				warpName = GUILayout.TextField (warpName);
 				w1 = GUILayout.TextField (w1);
@@ -185,7 +213,6 @@ namespace BetterTimeWarp
 						SaveCustomWarpRates ();
 						editToggle = false;
 						SetWarpRates (timeWarpRates);
-						PopupDialog.SpawnPopupDialog ("Better Time Warp", "Custom warp rates saved, you may now access them from any save", "Ok", true, skin);
 						warpName = "Name";
 						physics = false;
 						w1 = "10";
@@ -197,99 +224,102 @@ namespace BetterTimeWarp
 						w7 = "10000000";
 					}
 				}
-			}
-			else
-			{
-				scrollPos = GUILayout.BeginScrollView (scrollPos);
-				List<string> names = new List<string> ();
-				foreach (var rates in customWarps)
-				{
-					names.Add (rates.Name);
-				}
-				selected = GUILayout.SelectionGrid (selected, names.ToArray(), 1);
-				currentRates = customWarps [selected];
-				GUILayout.EndScrollView ();
-			}
-			GUILayout.EndVertical ();
-			GUILayout.Space (10f);
 
-			GUILayout.BeginVertical ();
-			GUILayout.Label (currentRates.Name);
-			GUILayout.BeginScrollView (new Vector2 (0f, 0f));
-			if (!currentRates.Physics)
-				GUILayout.Label ("Time Warp Rates: ");
+				GUILayout.EndVertical ();
+			}
 			else
-				GUILayout.Label ("Physics Warp Rates: ");
-			GUILayout.Label (currentRates.Rates [0].ToString ());
-			GUILayout.Label (currentRates.Rates [1].ToString ());
-			GUILayout.Label (currentRates.Rates [2].ToString ());
-			GUILayout.Label (currentRates.Rates [3].ToString ());
-			if (!currentRates.Physics)
 			{
-				GUILayout.Label (currentRates.Rates [4].ToString ());
-				GUILayout.Label (currentRates.Rates [5].ToString ());
-				GUILayout.Label (currentRates.Rates [6].ToString ());
-				GUILayout.Label (currentRates.Rates [7].ToString ());
-			}
-			GUILayout.Space (10f);
-			if (GUILayout.Button ("Select"))
-			{
-				SetWarpRates (currentRates);
-			}
-			if (GUILayout.Button ("Edit"))
-			{
-				if (currentRates != StandardWarp && currentRates != StandardPhysWarp)
+				GUILayout.BeginVertical (skin.box);
+
+				GUILayout.BeginVertical (skin.textArea);
+				GUILayout.Label (currentRates.Rates [0].ToString ());
+				GUILayout.Label (currentRates.Rates [1].ToString ());
+				GUILayout.Label (currentRates.Rates [2].ToString ());
+				GUILayout.Label (currentRates.Rates [3].ToString ());
+				if (!currentRates.Physics)
 				{
-					SetWarpRates (StandardWarp);
-					customWarps.Remove (currentRates);
-					editToggle = true;
-					warpName = currentRates.Name;
-					physics = currentRates.Physics;
-					w1 = currentRates.Rates[1].ToString();
-					w2 = currentRates.Rates[2].ToString();
-					w3 = currentRates.Rates[3].ToString();
-					if (!physics)
+					GUILayout.Label (currentRates.Rates [4].ToString ());
+					GUILayout.Label (currentRates.Rates [5].ToString ());
+					GUILayout.Label (currentRates.Rates [6].ToString ());
+					GUILayout.Label (currentRates.Rates [7].ToString ());
+				}
+				GUILayout.EndVertical ();
+
+				GUILayout.Space (15f);
+				if (GUILayout.Button ("Select"))
+				{
+					SetWarpRates (currentRates);
+				}
+				if (currentRates != StandardWarp && currentRates != StandardPhysWarp && GUILayout.Button ("Edit"))
+				{
+					if (currentRates != StandardWarp && currentRates != StandardPhysWarp)
 					{
-						w4 = currentRates.Rates[4].ToString();
-						w5 = currentRates.Rates[5].ToString();
-						w6 = currentRates.Rates[6].ToString();
-						w7 = currentRates.Rates[7].ToString();
+						if(!currentRates.Physics)
+							SetWarpRates (StandardWarp, false);
+						else
+							SetWarpRates (StandardPhysWarp, false);
+						customWarps.Remove (currentRates);
+						editToggle = true;
+						warpName = currentRates.Name;
+						physics = currentRates.Physics;
+						w1 = currentRates.Rates[1].ToString();
+						w2 = currentRates.Rates[2].ToString();
+						w3 = currentRates.Rates[3].ToString();
+						if (!physics)
+						{
+							w4 = currentRates.Rates[4].ToString();
+							w5 = currentRates.Rates[5].ToString();
+							w6 = currentRates.Rates[6].ToString();
+							w7 = currentRates.Rates[7].ToString();
+						}
+						selected = 0;
 					}
-					selected = 0;
+					else
+					{
+						PopupDialog.SpawnPopupDialog ("Better Time Warp", "Cannot edit standard warp rates", "Ok", true, skin);
+					}
 				}
-				else
+				if (currentRates != StandardWarp && currentRates != StandardPhysWarp && GUILayout.Button ("Delete"))
 				{
-					PopupDialog.SpawnPopupDialog ("Better Time Warp", "Cannot edit standard warp rates", "Ok", true, skin);
+					if (currentRates != StandardWarp && currentRates != StandardPhysWarp)
+					{
+						customWarps.Remove (currentRates);
+						selected = 0;
+						SaveCustomWarpRates ();
+						PopupDialog.SpawnPopupDialog ("Better Time Warp", "Deleted " + currentRates.Name + " time warp rates", "Ok", true, skin);
+						SetWarpRates (StandardWarp, false);
+					}
+					else
+					{
+						PopupDialog.SpawnPopupDialog ("Better Time Warp", "Cannot delete standard warp rates", "Ok", true, skin);
+					}
 				}
+				GUILayout.EndVertical ();
 			}
-			if (GUILayout.Button ("Delete"))
-			{
-				if (currentRates != StandardWarp && currentRates != StandardPhysWarp)
-				{
-					SetWarpRates (StandardWarp);
-					customWarps.Remove (currentRates);
-					selected = 0;
-					SaveCustomWarpRates ();
-				}
-				else
-				{
-					PopupDialog.SpawnPopupDialog ("Better Time Warp", "Cannot delete standard warp rates", "Ok", true, skin);
-				}
-			}
-			GUILayout.EndScrollView ();
-
 			GUILayout.EndVertical ();
 			GUI.DragWindow ();
 			GUILayout.EndHorizontal ();
 		}
 
-		public void SetWarpRates(TimeWarpRates rates)
+		public void SetWarpRates(TimeWarpRates rates, bool message = true)
 		{
 			if (timeWarp != null)
 			{
 				if (timeWarp.warpRates.Length == rates.Rates.Length && !rates.Physics)
 				{
 					timeWarp.warpRates = rates.Rates;
+					CurrentWarp = rates;
+
+					for (var i = 0; i < customWarps.Count; i++)
+					{
+						var r = customWarps [i];
+						if (r == rates)
+						{
+							selected = i;
+							break;
+						}
+					}
+
 					string ratesString = "";
 					foreach (float f in rates.Rates)
 					{
@@ -297,12 +327,15 @@ namespace BetterTimeWarp
 					}
 					ratesString.Remove (ratesString.Length - 3);
 					print ("[BetterTimeWarp]: Set time warp rates to " + ratesString);
-					ScreenMessages.PostScreenMessage (new ScreenMessage ("New time warp rates: " + rates.Name, 3f, ScreenMessageStyle.UPPER_CENTER), false);
+					if (message)
+						ScreenMessages.PostScreenMessage (new ScreenMessage ("New time warp rates: " + rates.Name, 3f, ScreenMessageStyle.UPPER_CENTER), false);
 					return;
 				}
 				if (timeWarp.physicsWarpRates.Length == rates.Rates.Length && rates.Physics)
 				{
 					timeWarp.physicsWarpRates = rates.Rates;
+					CurrentPhysWarp = rates;
+
 					string ratesString = "";
 					foreach (float f in rates.Rates)
 					{
@@ -310,7 +343,8 @@ namespace BetterTimeWarp
 					}
 					ratesString.Remove (ratesString.Length - 3);
 					print ("[BetterTimeWarp]: Set time warp rates to " + ratesString);
-					ScreenMessages.PostScreenMessage (new ScreenMessage ("New physic warp rates: " + rates.Name, 3f, ScreenMessageStyle.UPPER_CENTER), false);
+					if (message)
+						ScreenMessages.PostScreenMessage (new ScreenMessage ("New physic warp rates: " + rates.Name, 3f, ScreenMessageStyle.UPPER_CENTER), false);
 					return;
 				}
 			}
@@ -408,81 +442,6 @@ namespace BetterTimeWarp
 				windowRect.xMax = float.Parse (values [2]);
 				windowRect.yMax = float.Parse (values [3]);
 			}
-		}
-	}
-	public class TimeWarpRates
-	{
-		public string Name;
-		public float[] Rates;
-		public bool Physics;
-		public TimeWarpRates(string name, float[] rates, bool physics)
-		{
-			this.Name = name;
-			this.Rates = rates;
-			this.Physics = physics;
-		}
-		public TimeWarpRates()
-		{
-		}
-	}
-
-	[KSPAddon(KSPAddon.Startup.MainMenu, false)]
-	public class BetterTimeWarpInitializer : MonoBehaviour
-	{
-		static bool started = false;
-		public void Start()
-		{
-			if (started)
-				Destroy (this);
-
-			BetterTimeWarp.SettingsNode = ConfigNode.Load (KSPUtil.ApplicationRootPath + "GameData/BetterTimeWarp/Settings.cfg");
-			if(BetterTimeWarp.SettingsNode == null)
-			{
-				ConfigNode node = new ConfigNode ();
-				node.AddValue ("enabled", "true");
-				BetterTimeWarp.SettingsNode = node;
-			}
-			if (!BetterTimeWarp.SettingsNode.HasValue ("enabled"))
-			{
-				BetterTimeWarp.SettingsNode.AddValue ("enabled", "true");
-			}
-			bool isEnabled = true;
-			if (bool.TryParse (BetterTimeWarp.SettingsNode.GetValue ("enabled"), out isEnabled))
-			{
-				BetterTimeWarp.isEnabled = isEnabled;
-			}
-			if (!isEnabled)
-			{
-				Debug.LogError ("[BetterTimeWarp]: enabled = false in settings, disabling BetterTimeWarp");
-				Destroy (this);
-			}
-			BetterTimeWarp.SettingsNode.Save (KSPUtil.ApplicationRootPath + "GameData/BetterTimeWarp/Settings.cfg");
-
-			GameEvents.onGameStateSaved.Add (SaveSettings);
-			GameEvents.onShowUI.Add (ShowUI);
-			GameEvents.onHideUI.Add (HideUI);
-
-			foreach (CelestialBody body in FlightGlobals.Bodies)
-			{
-				body.timeWarpAltitudeLimits = new float[]{ 0f, 0f, 0f, 0f, 0f, 0f, 100000f, 2000000f };
-			}
-
-			started = true;
-		}
-
-		void SaveSettings (Game game)
-		{
-			BetterTimeWarp.SettingsNode.Save (KSPUtil.ApplicationRootPath + "GameData/BetterTimeWarp/Settings.cfg");
-			Debug.Log ("[BetterTimeWarp]: Settings saved");
-			BetterTimeWarp.SettingsNode = ConfigNode.Load (KSPUtil.ApplicationRootPath + "GameData/BetterTimeWarp/Settings.cfg");
-		}
-		void ShowUI()
-		{
-			BetterTimeWarp.ShowUI = true;
-		}
-		void HideUI()
-		{
-			BetterTimeWarp.ShowUI = false;
 		}
 	}
 }
