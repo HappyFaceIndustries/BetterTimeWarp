@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace BetterTimeWarp
 {
-	[KSPAddon(KSPAddon.Startup.MainMenu, false)]
+	[KSPAddon(KSPAddon.Startup.MainMenu, true)]
 	public class BetterTimeWarpInitializer : MonoBehaviour
 	{
 		static bool started = false;
@@ -13,6 +13,8 @@ namespace BetterTimeWarp
 			//only call this once at the beginning of the game
 			if (!started)
 			{
+				DontDestroyOnLoad (this);
+
 				//load the settings
 				BetterTimeWarp.SettingsNode = ConfigNode.Load (KSPUtil.ApplicationRootPath + "GameData/BetterTimeWarp/Settings.dat");
 
@@ -53,14 +55,25 @@ namespace BetterTimeWarp
 					body.timeWarpAltitudeLimits = new float[]{ 0f, 0f, 0f, 0f, 0f, 0f, 100000f, 2000000f };
 				}
 
+				GameEvents.onLevelWasLoadedGUIReady.Add (OnLevelLoaded);
+
 				started = true;
+			}
+		}
+
+		private void OnLevelLoaded(GameScenes scene)
+		{
+			//call this every scene that needs BetterTimeWarp
+			if (scene == GameScenes.FLIGHT || scene == GameScenes.SPACECENTER || scene == GameScenes.TRACKSTATION)
+			{
+				BetterTimeWarp.Instance = gameObject.AddComponent<BetterTimeWarp> ();
 			}
 		}
 
 		//called whenever the game autosaves/quicksaves
 		void SaveSettings (Game game)
 		{
-			BetterTimeWarp.SettingsNode.Save (KSPUtil.ApplicationRootPath + "GameData/BetterTimeWarp/Settings.dat", " DO NOT CHANGE THE CONTENTS OF THIS FILE. Saved:" + System.DateTime.Now.ToString());
+			BetterTimeWarp.SettingsNode.Save (KSPUtil.ApplicationRootPath + "GameData/BetterTimeWarp/Settings.dat", "BetterTimeWarp: Automatically saved at date " + System.DateTime.Now.ToString());
 			Debug.Log ("[BetterTimeWarp]: Settings saved");
 			BetterTimeWarp.SettingsNode = ConfigNode.Load (KSPUtil.ApplicationRootPath + "GameData/BetterTimeWarp/Settings.dat");
 		}

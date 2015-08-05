@@ -1,9 +1,13 @@
+// BetterTimeWarp: Automatically saved at date 8/5/2015 1:04:05 AM
+
 enabled = true
 BetterTimeWarp
 {
 	ScaleCameraSpeed = True
 	UseLosslessPhysics = False
 	LosslessUpperThreshold = 2
+	CurrentTimeWarp = Orbital Warping
+	CurrentPhysWarp = Standard Physics Warp
 	CustomWarpRate
 	{
 		name = Hyper Warp

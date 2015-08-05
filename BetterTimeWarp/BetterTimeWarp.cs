@@ -5,7 +5,6 @@ using UnityEngine;
 
 namespace BetterTimeWarp
 {
-	[KSPAddon(KSPAddon.Startup.Flight, false)]
 	public class BetterTimeWarp : MonoBehaviour
 	{
 		public static BetterTimeWarp Instance;
@@ -14,39 +13,43 @@ namespace BetterTimeWarp
 		public static bool isEnabled = true;
 		public static ConfigNode SettingsNode;
 
-		public TimeWarp timeWarp;
 		public List<TimeWarpRates> customWarps = new List<TimeWarpRates> ();
 		public static bool ShowUI = true;
 
-		Texture2D upArrow;
-		Texture2D downArrow;
-
-		public BetterTimeWarp()
+		public static bool UIOpen
 		{
-			Instance = this;
+			get
+			{
+				return Instance.windowOpen;
+			}
+			set
+			{
+				Instance.windowOpen = value;
+			}
 		}
+		public ApplicationLauncherButton Button;
+		private static bool hasFalsedRecently = false;
+		private static bool isHovering = false;
+		private static bool hasAdded = false;
+
+		static Texture2D upArrow;
+		static Texture2D downArrow;
+
 		public void Start()
 		{
 			if (!isEnabled)
 			{
 				Debug.LogError ("[BetterTimeWarp]: enabled = false in settings, disabling BetterTimeWarp");
-				Destroy (this);
+				DestroyImmediate (this);
+				return;
 			}
-			if (TimeWarp.fetch != null)
-				timeWarp = TimeWarp.fetch;
-			else
-			{
-				Debug.LogError ("[BetterTimeWarp]: TimeWarp.fetch not found, disabling BetterTimeWarp");
-				Destroy (this);
-			}
+
+			this.skin = HighLogic.Skin;
 
 			LoadCustomWarpRates ();
-			SetWarpRates (StandardWarp, false);
-			SetWarpRates (StandardPhysWarp, false);
 
-			quikWindowRect = new Rect((timeWarp.timeQuadrantTab.renderer.material.mainTexture.width - 55f) * ScreenSafeUI.PixelRatio, 20f, 200f, 410f);
-			advWindowRect = new Rect((timeWarp.timeQuadrantTab.renderer.material.mainTexture.width - 55f) * ScreenSafeUI.PixelRatio, 20f, 420f, 410f);
-			physSettingsRect = new Rect((timeWarp.timeQuadrantTab.renderer.material.mainTexture.width - 55f) * ScreenSafeUI.PixelRatio, 430f, 420f, 220f);
+			SetWarpRates (CurrentWarp, false);
+			SetWarpRates (CurrentPhysWarp, false);
 
 			windowStyle = new GUIStyle(skin.window);
 			windowStyle.padding.left = 5;
@@ -70,6 +73,51 @@ namespace BetterTimeWarp
 			buttonContent = downContent;
 
 			GameEvents.onGameStateSave.Add (SaveSettingsAndCrap);
+
+			//add the toolbar button to non-flight scenes
+			if(!hasAdded)
+			{
+				var buttonTexture = GameDatabase.Instance.GetTexture ("BetterTimeWarp/Icons/application", false);
+				Button = ApplicationLauncher.Instance.AddModApplication (
+					new RUIToggleButton.OnTrue(delegate
+						{
+							BetterTimeWarp.UIOpen = true;
+						}),
+					new RUIToggleButton.OnFalse(delegate
+						{
+							if(!isHovering)
+								BetterTimeWarp.UIOpen = false;
+
+							/* 
+							 * this fixes some finicky button behaviour, it just prevents the OnHover/OnHoverOut events
+							 * from being automatically called after clicking it to false
+							 */
+							if(isHovering)
+								hasFalsedRecently = true;
+						}),
+					new RUIToggleButton.OnHover(delegate
+						{
+							if(!hasFalsedRecently)
+								BetterTimeWarp.UIOpen = true;
+							isHovering = true;
+
+							//reset finicky button fix so it can run again
+							hasFalsedRecently = false;
+						}),
+					new RUIToggleButton.OnHoverOut(delegate
+						{
+							isHovering = false;
+							//only hide it if we haven't clicked
+							if(Button.State != RUIToggleButton.ButtonState.TRUE && !hasFalsedRecently)
+							{
+								BetterTimeWarp.UIOpen = false;
+							}
+						}),
+					null, null, ApplicationLauncher.AppScenes.SPACECENTER | ApplicationLauncher.AppScenes.TRACKSTATION, buttonTexture
+				);
+				ApplicationLauncher.Instance.EnableMutuallyExclusive (Button);
+				hasAdded = true;
+			}
 		}
 		void OnDestroy()
 		{
@@ -79,13 +127,28 @@ namespace BetterTimeWarp
 		{
 			SaveCustomWarpRates ();
 		}
+		void CreateRectangles()
+		{
+			if (HighLogic.LoadedSceneIsFlight)
+			{
+				quikWindowRect = new Rect (153f * ScreenSafeUI.PixelRatio, 20f, 200f, 410f);
+				advWindowRect = new Rect (153f * ScreenSafeUI.PixelRatio, 20f, 420f, 410f);
+				physSettingsRect = new Rect (153f * ScreenSafeUI.PixelRatio, 430f, 420f, 220f);
+			}
+			else
+			{
+				quikWindowRect = new Rect ((Screen.width - 205f), 40f, 200f, 410f);
+				advWindowRect = new Rect ((Screen.width - 425f), 40f, 420f, 410f);
+				physSettingsRect = new Rect ((Screen.width - 425f), 450f, 420f, 220f);
+			}
+		}
 
 		//physics settings
 		public bool ScaleCameraSpeed = true;
 		public bool UseLosslessPhysics = false;
 		public float LosslessUpperThreshold = 2f;
 
-		GUISkin skin = HighLogic.Skin;
+		GUISkin skin;
 
 		Rect advWindowRect = new Rect();
 		Rect physSettingsRect = new Rect();
@@ -103,11 +166,20 @@ namespace BetterTimeWarp
 
 		public void OnGUI()
 		{
+			if (HighLogic.LoadedScene == GameScenes.LOADINGBUFFER)
+				return;
+
 			if (ShowUI)
 			{
 				GUI.skin = skin;
 
-				windowOpen = GUI.Toggle (new Rect ((timeWarp.timeQuadrantTab.renderer.material.mainTexture.width - 55f) * ScreenSafeUI.PixelRatio, 0f, 20f, 20f), windowOpen, buttonContent, skin.button);
+				CreateRectangles ();
+
+				//flight
+				if (HighLogic.LoadedSceneIsFlight)
+				{
+					windowOpen = GUI.Toggle (new Rect (153f * ScreenSafeUI.PixelRatio, 0f, 20f, 20f), windowOpen, buttonContent, skin.button);
+				}
 				if (windowOpen)
 				{
 					if(!advWindowOpen)
@@ -122,7 +194,6 @@ namespace BetterTimeWarp
 					}
 
 					buttonContent = upContent;
-					timeWarp.timeQuadrantTab.Expand ();
 				}
 				else
 					buttonContent = downContent;
@@ -465,18 +536,16 @@ namespace BetterTimeWarp
 			{
 				if (Time.timeScale >= LosslessUpperThreshold)
 					Time.fixedDeltaTime = LosslessUpperThreshold * 0.02f;
-				else if (Time.timeScale < 1f)
-					Time.fixedDeltaTime = 0.02f;
 			}
 		}
 
 		public void SetWarpRates(TimeWarpRates rates, bool message = true)
 		{
-			if (timeWarp != null)
+			if (TimeWarp.fetch != null)
 			{
-				if (timeWarp.warpRates.Length == rates.Rates.Length && !rates.Physics)
+				if (TimeWarp.fetch.warpRates.Length == rates.Rates.Length && !rates.Physics)
 				{
-					timeWarp.warpRates = rates.Rates;
+					TimeWarp.fetch.warpRates = rates.Rates;
 					CurrentWarp = rates;
 
 					for (var i = 0; i < warpRates.Length; i++)
@@ -488,20 +557,14 @@ namespace BetterTimeWarp
 						}
 					}
 
-					string ratesString = "";
-					foreach (float f in rates.Rates)
-					{
-						ratesString += f.ToString () + ", ";
-					}
-					ratesString.Remove (ratesString.Length - 3);
-					print ("[BetterTimeWarp]: Set time warp rates to " + ratesString);
+					print ("[BetterTimeWarp]: Set time warp rates to " + rates.ToString());
 					if (message)
 						ScreenMessages.PostScreenMessage (new ScreenMessage ("New time warp rates: " + rates.Name, 3f, ScreenMessageStyle.UPPER_CENTER), false);
 					return;
 				}
-				if (timeWarp.physicsWarpRates.Length == rates.Rates.Length && rates.Physics)
+				else if (TimeWarp.fetch.physicsWarpRates.Length == rates.Rates.Length && rates.Physics)
 				{
-					timeWarp.physicsWarpRates = rates.Rates;
+					TimeWarp.fetch.physicsWarpRates = rates.Rates;
 					CurrentPhysWarp = rates;
 
 					for (var i = 0; i < physRates.Length; i++)
@@ -513,19 +576,40 @@ namespace BetterTimeWarp
 						}
 					}
 
-					string ratesString = "";
-					foreach (float f in rates.Rates)
-					{
-						ratesString += f.ToString () + ", ";
-					}
-					ratesString.Remove (ratesString.Length - 3);
-					print ("[BetterTimeWarp]: Set time warp rates to " + ratesString);
+					print ("[BetterTimeWarp]: Set time warp rates to " + rates.ToString());
 					if (message)
 						ScreenMessages.PostScreenMessage (new ScreenMessage ("New physic warp rates: " + rates.Name, 3f, ScreenMessageStyle.UPPER_CENTER), false);
 					return;
 				}
+				return;
 			}
 			Debug.LogWarning ("[BetterTimeWarp]: Failed to set warp rates");
+
+			//reset it to standard in case of  failiure
+			if (rates.Physics)
+			{
+				for (var i = 0; i < physRates.Length; i++)
+				{
+					var r = physRates [i];
+					if (r == StandardPhysWarp)
+					{
+						currPhysIndex = i;
+						CurrentPhysWarp = StandardPhysWarp;
+					}
+				}
+			}
+			else
+			{
+				for (var i = 0; i < warpRates.Length; i++)
+				{
+					var r = warpRates [i];
+					if (r == StandardWarp)
+					{
+						currWarpIndex = i;
+						CurrentWarp = StandardWarp;
+					}
+				}
+			}
 		}
 
 		private void LoadCustomWarpRates()
@@ -570,6 +654,29 @@ namespace BetterTimeWarp
 				}
 				customWarps.Add (new TimeWarpRates(name, rates, physics));
 			}
+
+			//populate the seperate arrays
+			warpRates = customWarps.Where (r => !r.Physics).ToArray();
+			physRates = customWarps.Where (r => r.Physics).ToArray();
+
+			//load selected rates
+			string currentTimeWarp = StandardWarp.Name;
+			string currentPhysWarp = StandardPhysWarp.Name;
+
+			if (node.HasValue ("CurrentTimeWarp"))
+				currentTimeWarp = node.GetValue ("CurrentTimeWarp");
+			if (node.HasValue ("CurrentPhysWarp"))
+				currentPhysWarp = node.GetValue ("CurrentPhysWarp");
+
+			if (warpRates.Where (w => w.Name == currentTimeWarp).Count () > 0)
+				CurrentWarp = warpRates.Where (w => w.Name == currentTimeWarp).First();
+			if (physRates.Where (w => w.Name == currentPhysWarp).Count () > 0)
+				CurrentPhysWarp = physRates.Where (w => w.Name == currentPhysWarp).First();
+
+			if (CurrentWarp == null)
+				CurrentWarp = StandardWarp;
+			if (CurrentPhysWarp == null)
+				CurrentPhysWarp = StandardPhysWarp;
 		}
 		private void SaveCustomWarpRates()
 		{
@@ -578,18 +685,9 @@ namespace BetterTimeWarp
 
 			ConfigNode node = SettingsNode.GetNode ("BetterTimeWarp");
 
-			if(node.HasValue("ScaleCameraSpeed"))
-				node.SetValue ("ScaleCameraSpeed", ScaleCameraSpeed.ToString ());
-			else
-				node.AddValue ("ScaleCameraSpeed", ScaleCameraSpeed.ToString ());
-			if(node.HasValue("UseLosslessPhysics"))
-				node.SetValue ("UseLosslessPhysics", UseLosslessPhysics.ToString ());
-			else
-				node.AddValue ("UseLosslessPhysics", UseLosslessPhysics.ToString ());
-			if (node.HasValue ("LosslessUpperThreshold"))
-				node.SetValue ("LosslessUpperThreshold", LosslessUpperThreshold.ToString ());
-			else
-				node.AddValue ("LosslessUpperThreshold", LosslessUpperThreshold.ToString ());
+			node.SetValue ("ScaleCameraSpeed", ScaleCameraSpeed.ToString (), true);
+			node.SetValue ("UseLosslessPhysics", UseLosslessPhysics.ToString (), true);
+			node.SetValue ("LosslessUpperThreshold", LosslessUpperThreshold.ToString (), true);
 
 			node.RemoveNodes ("CustomWarpRate");
 			foreach (var rates in customWarps)
@@ -612,6 +710,14 @@ namespace BetterTimeWarp
 					node.AddNode (rateNode);
 				}
 			}
+
+			if (CurrentWarp == null)
+				CurrentWarp = StandardWarp;
+			if (CurrentPhysWarp == null)
+				CurrentPhysWarp = StandardPhysWarp;
+
+			node.SetValue ("CurrentTimeWarp", CurrentWarp.Name, true);
+			node.SetValue ("CurrentPhysWarp", CurrentPhysWarp.Name, true);
 		}
 	}
 }
