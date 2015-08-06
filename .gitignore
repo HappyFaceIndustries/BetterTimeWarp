@@ -19,6 +19,14 @@ bld/
 [Bb]in/
 [Oo]bj/
 
+# build exporters
+*.bat
+
+# KSP output
+Physics.cfg
+PartDatabase.cfg
+KSP.log
+
 # Roslyn cache directories
 *.ide/
 
