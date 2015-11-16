@@ -42,7 +42,7 @@ namespace BetterTimeWarp
 					return;
 				}
 				//save the settings, so if they have been regenerated, it exsists and wont cause errors
-				BetterTimeWarp.SettingsNode.Save (KSPUtil.ApplicationRootPath + "GameData/BetterTimeWarp/settings.dat");
+				BetterTimeWarp.SettingsNode.Save (KSPUtil.ApplicationRootPath + "GameData/BetterTimeWarp/Settings.dat");
 
 				//subscribe to the events so that the settings save and the UI can hide/show
 				GameEvents.onGameStateSaved.Add (SaveSettings);

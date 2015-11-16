@@ -1,12 +1,10 @@
-// BetterTimeWarp: Automatically saved at date 8/5/2015 1:04:05 AM
-
 enabled = true
 BetterTimeWarp
 {
 	ScaleCameraSpeed = True
 	UseLosslessPhysics = False
 	LosslessUpperThreshold = 2
-	CurrentTimeWarp = Orbital Warping
+	CurrentTimeWarp = Standard Warp
 	CurrentPhysWarp = Standard Physics Warp
 	CustomWarpRate
 	{
@@ -22,30 +20,10 @@ BetterTimeWarp
 	}
 	CustomWarpRate
 	{
-		name = Super Physics Warp
-		warpRate1 = 5
-		warpRate2 = 33
-		warpRate3 = 100
-		physics = True
-	}
-	CustomWarpRate
-	{
 		name = Slow-Mo
 		warpRate1 = 0.5
 		warpRate2 = 0.25
 		warpRate3 = 0.1
 		physics = True
-	}
-	CustomWarpRate
-	{
-		name = Orbital Warping
-		warpRate1 = 5
-		warpRate2 = 10
-		warpRate3 = 50
-		warpRate4 = 100
-		warpRate5 = 500
-		warpRate6 = 1000
-		warpRate7 = 10000
-		physics = False
 	}
 }

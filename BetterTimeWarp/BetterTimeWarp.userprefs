@@ -1,9 +1,8 @@
-﻿<Properties StartupItem="BetterTimeWarp.csproj">
+﻿<Properties StartupItem="BetterTimeWarp.csproj" GitUserInfo="UsingGIT">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
   <MonoDevelop.Ide.Workbench ActiveDocument="BetterTimeWarp.cs">
     <Files>
-      <File FileName="BetterTimeWarp.cs" Line="21" Column="21" />
-      <File FileName="Initialization.cs" Line="1" Column="1" />
+      <File FileName="BetterTimeWarp.cs" Line="50" Column="50" />
       <File FileName="TimeWarpRates.cs" Line="1" Column="1" />
     </Files>
   </MonoDevelop.Ide.Workbench>
