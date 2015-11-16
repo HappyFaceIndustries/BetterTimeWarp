@@ -49,6 +49,9 @@ namespace BetterTimeWarp
 				GameEvents.onShowUI.Add (ShowUI);
 				GameEvents.onHideUI.Add (HideUI);
 
+				//make the physical time warp warning not pop up
+				GameSettings.SHOW_PWARP_WARNING = false;
+
 				//give every celestial body new time warp altitude limits
 				foreach (CelestialBody body in FlightGlobals.Bodies)
 				{

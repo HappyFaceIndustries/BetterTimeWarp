@@ -40,10 +40,10 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\..\References\1.0.4\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\..\..\References\1.0.5\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine">
-      <HintPath>..\..\..\References\1.0.4\UnityEngine.dll</HintPath>
+      <HintPath>..\..\..\References\1.0.5\UnityEngine.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
