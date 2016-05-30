@@ -7,6 +7,11 @@
 *.userosscache
 *.sln.docstates
 
+# Unity specific
+[Ll]ibrary/
+[Tt]emp/
+*.unityproj
+
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
