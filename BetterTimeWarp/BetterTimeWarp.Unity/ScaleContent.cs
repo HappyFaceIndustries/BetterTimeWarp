@@ -9,58 +9,117 @@ using UnityEngine.EventSystems;
 
 namespace BetterTimeWarp.Unity
 {
-	[AddComponentMenu("UI/Scale Content")]
+	[AddComponentMenu("BetterTimeWarp/Scale Content")]
+	[ExecuteInEditMode]
 	[RequireComponent(typeof(RectTransform))]
-	public class ScaleContent : MonoBehaviour
+	[DisallowMultipleComponent]
+	public class ScaleContent : UIBehaviour, ILayoutSelfController
 	{
-		public RectTransform ScaledFrom;
-		public Vector2 Scale = new Vector2 (1f, 1f);
-		public Vector2 AnchorPosition = new Vector2 (0f, 1f);
-
-		private RectTransform rectTransform;
-
-		private void Start()
+		[SerializeField]
+		private RectTransform scaledFrom;
+		public RectTransform ScaledFrom
 		{
-			rectTransform = GetComponent<RectTransform> ();
-
-			UpdateAnchor ();
-			UpdateScale ();
+			get
+			{
+				return scaledFrom;
+			}
+			set
+			{
+				scaledFrom = value;
+				SetDirty ();
+			}
+		}
+		[SerializeField]
+		private Vector2 scale = new Vector2 (1f, 1f);
+		public Vector2 Scale
+		{
+			get
+			{
+				return scale;
+			}
+			set
+			{
+				scale = value;
+				SetDirty ();
+			}
+		}
+		[SerializeField]
+		private Vector2 anchorPosition = new Vector2 (0f, 1f);
+		public Vector2 AnchorPosition
+		{
+			get
+			{
+				return anchorPosition;
+			}
+			set
+			{
+				anchorPosition = value;
+				SetDirty ();
+			}
 		}
 
+		[NonSerialized]
+		private RectTransform rect;
+		private RectTransform rectTransform
+		{
+			get
+			{
+				if (rect == null)
+					rect = transform as RectTransform;
+				return rect;
+			}
+		}
+
+		private DrivenRectTransformTracker tracker;
+
+		protected override void OnEnable ()
+		{
+			tracker.Add (this, rectTransform, DrivenTransformProperties.AnchorMin);
+			tracker.Add (this, rectTransform, DrivenTransformProperties.AnchorMax);
+			tracker.Add (this, rectTransform, DrivenTransformProperties.SizeDelta);
+
+			SetDirty ();
+		}
+		protected override void OnDisable ()
+		{
+			tracker.Clear ();
+		}
+		private void OnValidate()
+		{
+			SetDirty ();
+		}
 		private void Update()
 		{
-			UpdateScale ();
+			if (ScaledFrom != null && ScaledFrom.hasChanged)
+			{
+				SetDirty ();
+			}
 		}
 
-		public void UpdateAnchor()
+		private void UpdateProperties()
 		{
 			rectTransform.anchorMin = AnchorPosition;
 			rectTransform.anchorMax = AnchorPosition;
-		}
-		public void UpdateScale()
-		{
-			if (ScaledFrom == null || rectTransform == null)
-			{
-				return;
-			}
 
 			var scaledFromRect = ScaledFrom.rect;
 			rectTransform.sizeDelta = new Vector2 (scaledFromRect.width * Scale.x, scaledFromRect.height * Scale.y);
 		}
 
-		[ContextMenu("Update Properties (Manual)")]
-		public void UpdateProperties()
-		{
-			if(rectTransform == null)
-			{
-				rectTransform = GetComponent<RectTransform> ();
-			}
-			UpdateAnchor ();
-			UpdateScale ();
-		}
-		private void OnValidate()
+		public void SetLayoutHorizontal()
 		{
 			UpdateProperties ();
+		}
+		public void SetLayoutVertical()
+		{
+			UpdateProperties ();
+		}
+
+		private void SetDirty()
+		{
+			if (IsActive ())
+			{
+				LayoutRebuilder.MarkLayoutForRebuild (rectTransform);
+			}
 		}
 	}
 }

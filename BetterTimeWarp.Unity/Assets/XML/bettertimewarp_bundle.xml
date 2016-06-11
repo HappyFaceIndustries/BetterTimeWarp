@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<KSPBundleDefinition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" UrlName="bettertimewarp" Name="bettertimewarp" CreatedTime="-8587370225255413667">
-  <Author />
+<KSPBundleDefinition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" UrlName="bettertimewarp" Name="bettertimewarp" CreatedTime="-8587359866804778369">
+  <Author>MrHappyFace</Author>
   <Info />
   <Assets>
     <Asset Name="AddIcon" Path="Assets/Images/AddIcon.png" Type="Texture2D" Url="Images/AddIcon" AutoLoad="false" />
@@ -12,10 +12,8 @@
     <Asset Name="RemoveIconHover" Path="Assets/Images/RemoveIconHover.png" Type="Texture2D" Url="Images/RemoveIconHover" AutoLoad="false" />
     <Asset Name="SettingsIcon" Path="Assets/Images/SettingsIcon.png" Type="Texture2D" Url="Images/SettingsIcon" AutoLoad="false" />
     <Asset Name="SettingsIconHover" Path="Assets/Images/SettingsIconHover.png" Type="Texture2D" Url="Images/SettingsIconHover" AutoLoad="false" />
-    <Asset Name="TooltipBackground" Path="Assets/Images/TooltipBackground.png" Type="Texture2D" Url="Images/TooltipBackground" AutoLoad="false" />
     <Asset Name="UpIcon" Path="Assets/Images/UpIcon.png" Type="Texture2D" Url="Images/UpIcon" AutoLoad="false" />
-    <Asset Name="BetterTimeWarpWindow" Path="Assets/Prefabs/BetterTimeWarpWindow.prefab" Type="GameObject" Url="Prefabs/BetterTimeWarpWindow" AutoLoad="false" />
-    <Asset Name="DropdownButton" Path="Assets/Prefabs/DropdownButton.prefab" Type="GameObject" Url="Prefabs/DropdownButton" AutoLoad="false" />
+    <Asset Name="BetterTimeWarp" Path="Assets/Prefabs/BetterTimeWarp.prefab" Type="GameObject" Url="Prefabs/BetterTimeWarp" AutoLoad="false" />
     <Asset Name="TimeWarpSelection" Path="Assets/Prefabs/TimeWarpSelection.prefab" Type="GameObject" Url="Prefabs/TimeWarpSelection" AutoLoad="false" />
   </Assets>
   <Dependencies />

@@ -50,6 +50,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ScaleContent.cs" />
     <Compile Include="UISkinApplicator.cs" />
+    <Compile Include="BooleanSprite.cs" />
+    <Compile Include="ScrollRectPositionHandler.cs" />
+    <Compile Include="BetterTimeWarpController_Unity.cs" />
+    <Compile Include="AlignWithTimeQuadrantEdge.cs" />
+    <Compile Include="TimeWarpRates.cs" />
+    <Compile Include="WarpRatesSelector.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

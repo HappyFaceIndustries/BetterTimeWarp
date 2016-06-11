@@ -1,20 +1,28 @@
 using System;
+using System.Linq;
+using System.Collections;
 using System.Collections.Generic;
+
 using UnityEngine;
 
-namespace BetterTimeWarp
+namespace BetterTimeWarp.Unity
 {
 	public class TimeWarpRates
 	{
 		public string Name;
 		public float[] Rates;
-		public bool Physics;
+		public bool Physics
+		{
+			get
+			{
+				return Rates.Length == 4;
+			}
+		}
 
-		public TimeWarpRates(string name, float[] rates, bool physics)
+		public TimeWarpRates(string name, float[] rates)
 		{
 			this.Name = name;
 			this.Rates = rates;
-			this.Physics = physics;
 		}
 		public TimeWarpRates()
 		{

@@ -1,8 +1,16 @@
 ﻿<Properties StartupItem="BetterTimeWarp.csproj" GitUserInfo="UsingGIT">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="BetterTimeWarp.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="UISkinApplier.cs">
     <Files>
-      <File FileName="BetterTimeWarp.cs" Line="11" Column="22" />
+      <File FileName="BetterTimeWarp.cs" Line="31" Column="36" />
+      <File FileName="UISkinApplier.cs" Line="70" Column="6" />
+      <File FileName="BetterTimeWarpController_KSP.cs" Line="36" Column="4" />
+      <File FileName="AssetBundleLoader.cs" Line="27" Column="25" />
+      <File FileName="BetterTimeWarp.Unity\BetterTimeWarpController_Unity.cs" Line="79" Column="16" />
+      <File FileName="BetterTimeWarp.Unity\TimeWarpRates.cs" Line="27" Column="25" />
+      <File FileName="BetterTimeWarp.Unity\WarpRatesSelector.cs" Line="46" Column="4" />
+      <File FileName="BetterTimeWarp.Unity\AlignWithTimeQuadrantEdge.cs" Line="14" Column="43" />
+      <File FileName="BetterTimeWarp.Unity\ScrollRectPositionHandler.cs" Line="75" Column="12" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

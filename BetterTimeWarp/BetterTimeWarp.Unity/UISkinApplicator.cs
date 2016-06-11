@@ -9,8 +9,9 @@ using UnityEngine.EventSystems;
 
 namespace BetterTimeWarp.Unity
 {
-	[AddComponentMenu("KSP/UISkin Applicator")]
+	[AddComponentMenu("BetterTimeWarp/UISkin Applicator")]
 	[RequireComponent(typeof(RectTransform))]
+	[DisallowMultipleComponent]
 	public class UISkinApplicator : MonoBehaviour
 	{
 		[SerializeField]
@@ -37,8 +38,10 @@ namespace BetterTimeWarp.Unity
 		{
 			var graphic = GetComponent<Graphic> ();
 			var selectable = GetComponent<Selectable> ();
+			var parent = GetComponentInParent<UISkinApplicator> ();
+			var parentElementType = (parent == null) ? parent.ElementType : UISkinElementType.None;
 
-			return new ElementUIComponents (graphic, selectable);
+			return new ElementUIComponents (graphic, selectable, parentElementType);
 		}
 
 		public enum UISkinElementType
@@ -61,36 +64,40 @@ namespace BetterTimeWarp.Unity
 			VerticalScrollbarUpButton,
 			VerticalScrollbarDownButton,
 			HorizontalSlider,
-			VerticalSlider
+			HorizontalSliderThumb,
+			VerticalSlider,
+			VerticalSliderThumb
 		}
 
 		[Serializable]
 		public class ElementUseSettings
 		{
-			//text settings
+			//texture settings
+			[Header("Non-Label Settings")]
+			public bool UseNormalSpriteBackground = true;
+			public bool UseSpriteTransitions = true;
+
+			//label settings
+			[Header("Label Settings")]
 			public bool UseStyleFont = true;
 			public bool UseStyleFontSize = true;
 			public bool UseStyleFontStyle = false;
-			public bool UseStyleRichText = false;
-			public bool UseStyleWordWrap = false;
-			public bool UseStyleTextClipping = false;
 			public bool UseNormalTextColor = true;
 			public bool UseTextColorTransitions = true;
-
-			//texture settings
-			public bool UseNormalSpriteBackground = true;
-			public bool UseSpriteTransitions = true;
+			public bool UseParentTextStyling = true;
 		}
 
 		public struct ElementUIComponents
 		{
 			public Graphic Graphic;
 			public Selectable Selectable;
+			public UISkinApplicator.UISkinElementType ParentElementType;
 
-			public ElementUIComponents(Graphic graphic, Selectable selectable)
+			public ElementUIComponents(Graphic graphic, Selectable selectable, UISkinApplicator.UISkinElementType parentElementType)
 			{
 				Graphic = graphic;
 				Selectable = selectable;
+				ParentElementType = parentElementType;
 			}
 		}
 	}
