@@ -34,6 +34,17 @@ namespace BetterTimeWarp
 		{
 			UISkinApplier.ApplyUISkin (element, UISkinManager.defaultSkin, recursively);
 		}
+		private void SetWarpRates(TimeWarpRates rates)
+		{
+			if(rates.Physics)
+			{
+				
+			}
+			else
+			{
+				
+			}
+		}
 
 		private void Start()
 		{

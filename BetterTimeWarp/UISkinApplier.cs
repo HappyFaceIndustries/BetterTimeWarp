@@ -15,6 +15,8 @@ namespace BetterTimeWarp
 {
 	public static class UISkinApplier
 	{
+		private static Color SelectionColor = new Color (1f, 0.384f, 0f, 0.7f);
+		private static float CaretBlinkRate = 0.53f;
 		public static void ApplyUISkin(GameObject element, UISkinDef uiSkin, bool recursive = false)
 		{
 			if (recursive)
@@ -91,6 +93,13 @@ namespace BetterTimeWarp
 					colors.pressedColor = uiStyle.active.textColor;
 					components.Selectable.colors = colors;
 				}
+			}
+
+			if(components.Selectable is InputField)
+			{
+				var inputField = components.Selectable as InputField;
+				inputField.selectionColor = SelectionColor;
+				inputField.caretBlinkRate = CaretBlinkRate;
 			}
 		}
 
