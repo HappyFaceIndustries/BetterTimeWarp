@@ -34,15 +34,27 @@ namespace BetterTimeWarp
 		{
 			UISkinApplier.ApplyUISkin (element, UISkinManager.defaultSkin, recursively);
 		}
-		private void SetWarpRates(TimeWarpRates rates)
+		public TimeWarpRates CurrentWarpRate;
+		public TimeWarpRates CurrentPhysRate;
+		public void SetWarpRates(TimeWarpRates rates)
 		{
+			var timeWarp = TimeWarp.fetch;
+			if(timeWarp == null)
+			{
+				Utils.LogError ("Cannot set warp rates now because TimeWarp.fetch is null");
+				return;
+			}
 			if(rates.Physics)
 			{
-				
+				timeWarp.physicsWarpRates = rates.Rates;
+				CurrentPhysRate = rates;
+				Utils.Log ("Set physics rates to " + rates.Name);
 			}
 			else
 			{
-				
+				timeWarp.warpRates = rates.Rates;
+				CurrentWarpRate = rates;
+				Utils.Log ("Set warp rates to " + rates.Name);
 			}
 		}
 
@@ -50,6 +62,7 @@ namespace BetterTimeWarp
 		{
 			UnityController.getTimeQuadrantWidth = GetTimeQuadrantWidth;
 			UnityController.applyUISkin = ApplyUISkin;
+			UnityController.setWarpRates = SetWarpRates;
 		}
 
 		private void Awake()

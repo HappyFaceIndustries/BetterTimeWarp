@@ -10,9 +10,9 @@ using UnityEngine.EventSystems;
 namespace BetterTimeWarp.Unity
 {
 	[AddComponentMenu("BetterTimeWarp/Scale Content")]
-	[ExecuteInEditMode]
 	[RequireComponent(typeof(RectTransform))]
 	[DisallowMultipleComponent]
+	[ExecuteInEditMode]
 	public class ScaleContent : UIBehaviour, ILayoutSelfController
 	{
 		[SerializeField]

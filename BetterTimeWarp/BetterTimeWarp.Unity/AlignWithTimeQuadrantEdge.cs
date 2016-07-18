@@ -10,9 +10,9 @@ using UnityEngine.EventSystems;
 namespace BetterTimeWarp.Unity
 {
 	[AddComponentMenu("BetterTimeWarp/Align With TimeQuadrant Edge")]
-	[ExecuteInEditMode]
 	[RequireComponent(typeof(RectTransform))]
 	[DisallowMultipleComponent]
+	[ExecuteInEditMode]
 	public class AlignWithTimeQuadrantEdge : UIBehaviour, ILayoutSelfController
 	{
 		[NonSerialized]

@@ -15,7 +15,7 @@ namespace BetterTimeWarp.Unity
 		{
 			get
 			{
-				return Rates.Length == 4;
+				return Rates.Length == BetterTimeWarpController_Unity.PhysRatesCount;
 			}
 		}
 

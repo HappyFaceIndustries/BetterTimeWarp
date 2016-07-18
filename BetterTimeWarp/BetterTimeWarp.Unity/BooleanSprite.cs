@@ -13,7 +13,8 @@ namespace BetterTimeWarp.Unity
 	[RequireComponent(typeof(Image))]
 	public class BooleanSprite : MonoBehaviour
 	{
-		public Image Image;
+		[SerializeField]
+		private Image Image;
 
 		[Space(10f)]
 		public Sprite TrueSprite;

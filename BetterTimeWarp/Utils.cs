@@ -5,6 +5,8 @@ using System.Collections.Generic;
 
 using UnityEngine;
 
+using BetterTimeWarp.Unity;
+
 namespace BetterTimeWarp
 {
 	public static class Utils

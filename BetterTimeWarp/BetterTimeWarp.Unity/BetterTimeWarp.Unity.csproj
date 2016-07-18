@@ -56,6 +56,9 @@
     <Compile Include="AlignWithTimeQuadrantEdge.cs" />
     <Compile Include="TimeWarpRates.cs" />
     <Compile Include="WarpRatesSelector.cs" />
+    <Compile Include="EditFieldTextValidation.cs" />
+    <Compile Include="EditScreenController.cs" />
+    <Compile Include="ExpandoRect.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

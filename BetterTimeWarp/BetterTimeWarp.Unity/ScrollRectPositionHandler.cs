@@ -34,7 +34,7 @@ namespace BetterTimeWarp.Unity
 			}
 
 			//do instantly if needed
-			if (TransitionLength <= 0f || !UseTransition)
+			if (TransitionLength <= 0f || !UseTransition || !BetterTimeWarpController_Unity.Instance.AnimatedUI)
 			{
 				MoveToInstantly (positionIndex);
 				return;
@@ -66,6 +66,7 @@ namespace BetterTimeWarp.Unity
 				ScrollRect.normalizedPosition = Vector2.Lerp (startPosition, position, curvedTime);
 				yield return null;
 			}
+			ScrollRect.normalizedPosition = position;
 		}
 
 		public void MoveToInstantly(int positionIndex)

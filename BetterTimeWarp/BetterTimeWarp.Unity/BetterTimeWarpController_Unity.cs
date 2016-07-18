@@ -10,6 +10,7 @@ using UnityEngine.EventSystems;
 namespace BetterTimeWarp.Unity
 {
 	[AddComponentMenu("BetterTimeWarp/Controller (Unity)")]
+	[DisallowMultipleComponent]
 	[ExecuteInEditMode]
 	public class BetterTimeWarpController_Unity : MonoBehaviour
 	{
@@ -19,12 +20,29 @@ namespace BetterTimeWarp.Unity
 			private set;
 		}
 
-		public ScrollRectPositionHandler ScrollRectHandler;
+		public const int PhysRatesCount = 4;
+		public const int WarpRatesCount = 8;
 
-		[Header("Time Warp Selection")]
+		[Header("Navigation")]
+		public ScrollRectPositionHandler ScrollRectHandler;
+		public int SelectScreenIndex = 0;
+		public int SettingsScreenIndex = 1;
+		public int EditScreenIndex = 2;
+
+		[Header("Selection")]
 		public GameObject TimeWarpSelectionPrefab;
 		public RectTransform TimeWarpListObject;
 		public RectTransform PhysWarpListObject;
+
+		[Header("Settings")]
+		public bool AnimatedUI = true;
+		public float MinPhysValue = 0.001f;
+		public float MaxPhysValue = 25f;
+		public float MinWarpValue = 1f;
+		public float MaxWarpValue = 1e+9f;
+
+		[Header("Edit")]
+		public EditScreenController EditController;
 
 		private List<TimeWarpRates> timeWarpRates = new List<TimeWarpRates>();
 		private List<TimeWarpRates> physWarpRates = new List<TimeWarpRates>();
@@ -75,6 +93,12 @@ namespace BetterTimeWarp.Unity
 			}
 		}
 
+		public void EditWarpRates(TimeWarpRates rates)
+		{
+			BetterTimeWarpController_Unity.Instance.ScrollRectHandler.MoveTo (EditScreenIndex);
+			EditController.SetEditingRates (rates);
+		}
+
 		public Func<float> getTimeQuadrantWidth = new Func<float> (delegate {
 			return 205f;
 		});
@@ -103,6 +127,7 @@ namespace BetterTimeWarp.Unity
 		private void Reset()
 		{
 			SetupInstance ();
+			EditController = GetComponentInChildren<EditScreenController> ();
 		}
 
 		private void SetupInstance()

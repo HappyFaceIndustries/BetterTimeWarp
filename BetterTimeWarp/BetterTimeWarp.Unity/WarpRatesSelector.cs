@@ -26,6 +26,7 @@ namespace BetterTimeWarp.Unity
 			if (Rates == null)
 			{
 				Rates = rates;
+				SetName (rates.Name);
 			}
 			else
 			{
@@ -51,13 +52,18 @@ namespace BetterTimeWarp.Unity
 		}
 		public void Edit()
 		{
-			BetterTimeWarpController_Unity.Instance.ScrollRectHandler.MoveTo (2);
+			BetterTimeWarpController_Unity.Instance.EditWarpRates (Rates);
 		}
 		public void Delete()
 		{
 			BetterTimeWarpController_Unity.Instance.RemoveWarpRates (Rates);
 		}
 
+		private void Start()
+		{
+			//temporary
+			AssignWarpRates (new TimeWarpRates ("Sky High", new float[]{1f, 4f, 8f, 16f}));
+		}
 		private void Reset()
 		{
 			NameText = GetComponentInChildren<Text> ();
