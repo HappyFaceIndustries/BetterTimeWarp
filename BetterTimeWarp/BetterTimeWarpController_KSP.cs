@@ -28,14 +28,17 @@ namespace BetterTimeWarp
 
 		private float GetTimeQuadrantWidth()
 		{
-			return 205f * FlightUIModeController.Instance.timeFrame.panelTransform.localScale.x * GameSettings.UI_SCALE;
+			return 205f * FlightUIModeController.Instance.timeFrame.panelTransform.localScale.x * MainCanvasUtil.MainCanvas.scaleFactor;
 		}
 		private void ApplyUISkin(GameObject element, bool recursively)
 		{
 			UISkinApplier.ApplyUISkin (element, UISkinManager.defaultSkin, recursively);
 		}
+
 		public TimeWarpRates CurrentWarpRate;
 		public TimeWarpRates CurrentPhysRate;
+		private ScreenMessage previousWarpScreenMessage;
+		private ScreenMessage previousPhysScreenMessage;
 		public void SetWarpRates(TimeWarpRates rates)
 		{
 			var timeWarp = TimeWarp.fetch;
@@ -49,12 +52,22 @@ namespace BetterTimeWarp
 				timeWarp.physicsWarpRates = rates.Rates;
 				CurrentPhysRate = rates;
 				Utils.Log ("Set physics rates to " + rates.Name);
+				if(previousPhysScreenMessage != null)
+				{
+					ScreenMessages.RemoveMessage (previousPhysScreenMessage);
+				}
+				previousPhysScreenMessage = ScreenMessages.PostScreenMessage ("New physics warp rates: " + rates.Name, 3f, ScreenMessageStyle.UPPER_CENTER);
 			}
 			else
 			{
 				timeWarp.warpRates = rates.Rates;
 				CurrentWarpRate = rates;
 				Utils.Log ("Set warp rates to " + rates.Name);
+				if(previousWarpScreenMessage != null)
+				{
+					ScreenMessages.RemoveMessage (previousWarpScreenMessage);
+				}
+				previousWarpScreenMessage = ScreenMessages.PostScreenMessage ("New time warp rates: " + rates.Name, 3f, ScreenMessageStyle.UPPER_CENTER);
 			}
 		}
 

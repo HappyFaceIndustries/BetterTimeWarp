@@ -79,6 +79,9 @@ namespace BetterTimeWarp.Unity
 			currentlyEditing.Rates = rates;
 
 			//show despawning save message
+
+			//temporary
+			BetterTimeWarpController_Unity.Instance.ScrollRectHandler.MoveTo (BetterTimeWarpController_Unity.Instance.SelectScreenIndex);
 		}
 
 		//figure out exit button and cancel button

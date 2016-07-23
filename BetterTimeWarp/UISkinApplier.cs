@@ -72,14 +72,6 @@ namespace BetterTimeWarp
 				{
 					text.color = textUiStyle.normal.textColor;
 				}
-				if (applicator.UseSettings.UseStyleFont)
-				{
-					text.font = textUiStyle.font;
-				}
-				if (applicator.UseSettings.UseStyleFontSize)
-				{
-					text.fontSize = textUiStyle.fontSize;
-				}
 				if (applicator.UseSettings.UseStyleFontStyle)
 				{
 					text.fontStyle = textUiStyle.fontStyle;

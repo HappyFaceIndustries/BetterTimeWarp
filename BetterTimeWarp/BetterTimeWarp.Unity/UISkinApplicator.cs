@@ -38,6 +38,10 @@ namespace BetterTimeWarp.Unity
 		{
 			var graphic = GetComponent<Graphic> ();
 			var selectable = GetComponent<Selectable> ();
+			if(selectable != null)
+			{
+				graphic = selectable.targetGraphic;
+			}
 			var parent = GetComponentInParent<UISkinApplicator> ();
 			var parentElementType = (parent == null) ? parent.ElementType : UISkinElementType.None;
 
@@ -79,8 +83,6 @@ namespace BetterTimeWarp.Unity
 
 			//label settings
 			[Header("Label Settings")]
-			public bool UseStyleFont = true;
-			public bool UseStyleFontSize = true;
 			public bool UseStyleFontStyle = false;
 			public bool UseNormalTextColor = true;
 			public bool UseTextColorTransitions = true;

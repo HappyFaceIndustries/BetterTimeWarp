@@ -16,17 +16,13 @@ using BetterTimeWarp.Unity;
 
 namespace BetterTimeWarp
 {
-	[KSPAddon(KSPAddon.Startup.Flight, true)]
+	[KSPAddon(KSPAddon.Startup.Flight, false)]
 	public class BetterTimeWarpFlight : MonoBehaviour
 	{
 		private GameObject betterTimeWarp;
 
 		private void Start()
 		{
-			Utils.Log ("cursorColor: " + HighLogic.Skin.settings.cursorColor);
-			Utils.Log ("cursorFlashSpeed: " + HighLogic.Skin.settings.cursorFlashSpeed);
-			Utils.Log ("selectionColor: " + HighLogic.Skin.settings.selectionColor);
-
 			var betterTimeWarpPrefab = AssetBundleLoading.Assets.GetAsset<GameObject> ("BetterTimeWarp");
 			betterTimeWarp = Instantiate (betterTimeWarpPrefab);
 
