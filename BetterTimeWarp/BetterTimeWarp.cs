@@ -3,6 +3,8 @@ using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 
+using KSP.UI.Screens;
+
 namespace BetterTimeWarp
 {
 	public class BetterTimeWarp : MonoBehaviour
@@ -11,7 +13,7 @@ namespace BetterTimeWarp
 		public static TimeWarpRates StandardWarp = new TimeWarpRates("Standard Warp", new float[]{1f, 5f, 10f, 50f, 100f, 1000f, 10000f, 100000f}, false);
 		public static TimeWarpRates StandardPhysWarp = new TimeWarpRates("Standard Physics Warp", new float[]{1f, 2f, 3f, 4f}, true);
 		public static bool isEnabled = true;
-		public static ConfigNode SettingsNode;
+        public static ConfigNode SettingsNode;
 
 		public List<TimeWarpRates> customWarps = new List<TimeWarpRates> ();
 		public static bool ShowUI = true;
@@ -28,8 +30,6 @@ namespace BetterTimeWarp
 			}
 		}
 		public ApplicationLauncherButton Button;
-		private static bool hasFalsedRecently = false;
-		private static bool isHovering = false;
 		private static bool hasAdded = false;
 
 		static Texture2D upArrow;
@@ -78,44 +78,18 @@ namespace BetterTimeWarp
 			if(!hasAdded)
 			{
 				var buttonTexture = GameDatabase.Instance.GetTexture ("BetterTimeWarp/Icons/application", false);
-				Button = ApplicationLauncher.Instance.AddModApplication (
-					new RUIToggleButton.OnTrue(delegate
+				Button = KSP.UI.Screens.ApplicationLauncher.Instance.AddModApplication(
+					new Callback(delegate
 						{
 							BetterTimeWarp.UIOpen = true;
 						}),
-					new RUIToggleButton.OnFalse(delegate
+                    new Callback(delegate
 						{
-							if(!isHovering)
-								BetterTimeWarp.UIOpen = false;
-
-							/* 
-							 * this fixes some finicky button behaviour, it just prevents the OnHover/OnHoverOut events
-							 * from being automatically called after clicking it to false
-							 */
-							if(isHovering)
-								hasFalsedRecently = true;
+							BetterTimeWarp.UIOpen = false;
 						}),
-					new RUIToggleButton.OnHover(delegate
-						{
-							if(!hasFalsedRecently)
-								BetterTimeWarp.UIOpen = true;
-							isHovering = true;
-
-							//reset finicky button fix so it can run again
-							hasFalsedRecently = false;
-						}),
-					new RUIToggleButton.OnHoverOut(delegate
-						{
-							isHovering = false;
-							//only hide it if we haven't clicked
-							if(Button.State != RUIToggleButton.ButtonState.TRUE && !hasFalsedRecently)
-							{
-								BetterTimeWarp.UIOpen = false;
-							}
-						}),
-					null, null, ApplicationLauncher.AppScenes.SPACECENTER | ApplicationLauncher.AppScenes.TRACKSTATION, buttonTexture
+                    null, null, null, null, KSP.UI.Screens.ApplicationLauncher.AppScenes.SPACECENTER | KSP.UI.Screens.ApplicationLauncher.AppScenes.TRACKSTATION, buttonTexture
 				);
-				ApplicationLauncher.Instance.EnableMutuallyExclusive (Button);
+				KSP.UI.Screens.ApplicationLauncher.Instance.EnableMutuallyExclusive (Button);
 				hasAdded = true;
 			}
 		}
@@ -131,9 +105,9 @@ namespace BetterTimeWarp
 		{
 			if (HighLogic.LoadedSceneIsFlight)
 			{
-				quikWindowRect = new Rect (153f * ScreenSafeUI.PixelRatio, 20f, 200f, 410f);
-				advWindowRect = new Rect (153f * ScreenSafeUI.PixelRatio, 20f, 420f, 410f);
-				physSettingsRect = new Rect (153f * ScreenSafeUI.PixelRatio, 430f, 420f, 220f);
+                quikWindowRect = new Rect(GameSettings.UI_SCALE * 210f /* * ScreenSafeUI.PixelRatio */, 20f, 200f, 410f);
+                advWindowRect = new Rect(GameSettings.UI_SCALE * 210f /* * ScreenSafeUI.PixelRatio */, 20f, 420f, 410f);
+                physSettingsRect = new Rect(GameSettings.UI_SCALE * 210f /* * ScreenSafeUI.PixelRatio */, 430f, 420f, 220f);
 			}
 			else
 			{
@@ -178,7 +152,7 @@ namespace BetterTimeWarp
 				//flight
 				if (HighLogic.LoadedSceneIsFlight)
 				{
-					windowOpen = GUI.Toggle (new Rect (153f * ScreenSafeUI.PixelRatio, 0f, 20f, 20f), windowOpen, buttonContent, skin.button);
+					windowOpen = GUI.Toggle (new Rect (GameSettings.UI_SCALE * 210f /* * ScreenSafeUI.PixelRatio */, 0f, 20f, 20f), windowOpen, buttonContent, skin.button);
 				}
 				if (windowOpen)
 				{
@@ -406,7 +380,7 @@ namespace BetterTimeWarp
 					}
 					else
 					{
-						PopupDialog.SpawnPopupDialog ("Error", "Cannot save because there are non-numbers in the editing fields", "Ok", false, skin);
+						PopupDialog.SpawnPopupDialog (new MultiOptionDialog("Cannot save because there are non-numbers in the editing fields", "Error", null), false, null);
 					}
 				}
 				if (GUILayout.Button ("Cancel", smallButtonStyle))
@@ -470,7 +444,7 @@ namespace BetterTimeWarp
 					}
 					else
 					{
-						PopupDialog.SpawnPopupDialog ("Better Time Warp", "Cannot edit standard warp rates", "Ok", true, skin);
+						PopupDialog.SpawnPopupDialog (new MultiOptionDialog("Cannot edit standard warp rates", "Better Time Warp", null), true, null);
 					}
 				}
 				if (currentRates != StandardWarp && currentRates != StandardPhysWarp && GUILayout.Button ("Delete", smallButtonStyle))
@@ -480,12 +454,12 @@ namespace BetterTimeWarp
 						customWarps.Remove (currentRates);
 						selected = 0;
 						SaveCustomWarpRates ();
-						PopupDialog.SpawnPopupDialog ("Better Time Warp", "Deleted " + currentRates.Name + " time warp rates", "Ok", true, skin);
+						PopupDialog.SpawnPopupDialog (new MultiOptionDialog("Deleted " + currentRates.Name + " time warp rates", "Better Time Warp", null), true, null);
 						SetWarpRates (StandardWarp, false);
 					}
 					else
 					{
-						PopupDialog.SpawnPopupDialog ("Better Time Warp", "Cannot delete standard warp rates", "Ok", true, skin);
+						PopupDialog.SpawnPopupDialog (new MultiOptionDialog("Cannot delete standard warp rates", "Better Time Warp", null), true, null);
 					}
 				}
 			}
@@ -559,7 +533,7 @@ namespace BetterTimeWarp
 
 					print ("[BetterTimeWarp]: Set time warp rates to " + rates.ToString());
 					if (message)
-						ScreenMessages.PostScreenMessage (new ScreenMessage ("New time warp rates: " + rates.Name, 3f, ScreenMessageStyle.UPPER_CENTER), false);
+						ScreenMessages.PostScreenMessage (new ScreenMessage ("New time warp rates: " + rates.Name, 3f, ScreenMessageStyle.UPPER_CENTER));
 					return;
 				}
 				else if (TimeWarp.fetch.physicsWarpRates.Length == rates.Rates.Length && rates.Physics)
@@ -578,7 +552,7 @@ namespace BetterTimeWarp
 
 					print ("[BetterTimeWarp]: Set time warp rates to " + rates.ToString());
 					if (message)
-						ScreenMessages.PostScreenMessage (new ScreenMessage ("New physic warp rates: " + rates.Name, 3f, ScreenMessageStyle.UPPER_CENTER), false);
+						ScreenMessages.PostScreenMessage (new ScreenMessage ("New physic warp rates: " + rates.Name, 3f, ScreenMessageStyle.UPPER_CENTER));
 					return;
 				}
 				return;

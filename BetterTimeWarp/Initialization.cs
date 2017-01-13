@@ -16,7 +16,7 @@ namespace BetterTimeWarp
 				DontDestroyOnLoad (this);
 
 				//load the settings
-				BetterTimeWarp.SettingsNode = ConfigNode.Load (KSPUtil.ApplicationRootPath + "GameData/BetterTimeWarp/Settings.dat");
+				BetterTimeWarp.SettingsNode = ConfigNode.Load (KSPUtil.ApplicationRootPath + "GameData/BetterTimeWarp/PluginData/Settings.dat");
 
 				//if the settings are not found, regenerate them
 				if (BetterTimeWarp.SettingsNode == null)
@@ -42,7 +42,7 @@ namespace BetterTimeWarp
 					return;
 				}
 				//save the settings, so if they have been regenerated, it exsists and wont cause errors
-				BetterTimeWarp.SettingsNode.Save (KSPUtil.ApplicationRootPath + "GameData/BetterTimeWarp/Settings.dat");
+				BetterTimeWarp.SettingsNode.Save (KSPUtil.ApplicationRootPath + "GameData/BetterTimeWarp/PluginData/Settings.dat");
 
 				//subscribe to the events so that the settings save and the UI can hide/show
 				GameEvents.onGameStateSaved.Add (SaveSettings);
@@ -76,9 +76,9 @@ namespace BetterTimeWarp
 		//called whenever the game autosaves/quicksaves
 		void SaveSettings (Game game)
 		{
-			BetterTimeWarp.SettingsNode.Save (KSPUtil.ApplicationRootPath + "GameData/BetterTimeWarp/Settings.dat", "BetterTimeWarp: Automatically saved at date " + System.DateTime.Now.ToString());
+			BetterTimeWarp.SettingsNode.Save (KSPUtil.ApplicationRootPath + "GameData/BetterTimeWarp/PluginData/Settings.dat", "BetterTimeWarp: Automatically saved at date " + System.DateTime.Now.ToString());
 			Debug.Log ("[BetterTimeWarp]: Settings saved");
-			BetterTimeWarp.SettingsNode = ConfigNode.Load (KSPUtil.ApplicationRootPath + "GameData/BetterTimeWarp/Settings.dat");
+			BetterTimeWarp.SettingsNode = ConfigNode.Load (KSPUtil.ApplicationRootPath + "GameData/BetterTimeWarp/PluginData/Settings.dat");
 		}
 
 		//these are called when F2 is pressed to hide/show the UI
