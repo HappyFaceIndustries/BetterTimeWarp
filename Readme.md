@@ -1,6 +1,6 @@
 #Better Time Warp
 
-Forum thread: forum.kerbalspaceprogram.com/threads/85926
+Forum thread: http://forum.kerbalspaceprogram.com/index.php?/topic/154935-*
 
 BetterTimeWarp is a mod for Kerbal Space Program that enables customized time warping.
 

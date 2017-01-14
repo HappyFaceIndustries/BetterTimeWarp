@@ -1,0 +1,10 @@
+2.3.0
+	Initial release
+
+2.3.1
+	Chagned settings file to live in PluginData as a true .cfg file
+	Fixed "enabled" setting in cfg file to be in a node
+	Updated link in Readme.md file
+
+ToDo
+	Move enabled setting into standard system settings

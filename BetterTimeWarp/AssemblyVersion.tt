@@ -27,7 +27,7 @@
 	int i2 = 0;
 	string s;
 
-	string versionfile =  @"D:\Users\jbb\github\tac\TacSelfDestruct\Source\TacSelfDestruct.version";
+	string versionfile =  @"D:\Users\jbb\github\BetterTimeWarp\BetterTimeWarp.version";
 	if (!File.Exists(versionfile))
 	{
 		Write("File: " + versionfile + " missing\n");		
