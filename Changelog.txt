@@ -2,9 +2,12 @@
 	Initial release
 
 2.3.1
-	Chagned settings file to live in PluginData as a true .cfg file
+	Changed settings file to live in PluginData as a true .cfg file
 	Fixed "enabled" setting in cfg file to be in a node
 	Updated link in Readme.md file
+
+2.3.2
+	Renamed Settings.dat to BetterTimeWarp.cfg (forgot to rename the file)
 
 ToDo
 	Move enabled setting into standard system settings
