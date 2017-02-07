@@ -7,42 +7,50 @@ using KSP.UI.Screens;
 
 namespace BetterTimeWarp
 {
-	public class BetterTimeWarp : MonoBehaviour
+   
+    [KSPAddon(KSPAddon.Startup.FlightAndKSC | KSPAddon.Startup.TrackingStation, false)]
+    public class BetterTimeWarp : MonoBehaviour
 	{
-		public static BetterTimeWarp Instance;
+		//public static BetterTimeWarp I1nstance;
 		public static TimeWarpRates StandardWarp = new TimeWarpRates("Standard Warp", new float[]{1f, 5f, 10f, 50f, 100f, 1000f, 10000f, 100000f}, false);
 		public static TimeWarpRates StandardPhysWarp = new TimeWarpRates("Standard Physics Warp", new float[]{1f, 2f, 3f, 4f}, true);
-		public static bool isEnabled = true;
+		//public static bool isEnabled = true;
         public static ConfigNode SettingsNode;
 
 		public List<TimeWarpRates> customWarps = new List<TimeWarpRates> ();
 		public static bool ShowUI = true;
 
-		public static bool UIOpen
+		public  bool UIOpen
 		{
 			get
 			{
-				return Instance.windowOpen;
+				return windowOpen;
 			}
 			set
 			{
-				Instance.windowOpen = value;
+				windowOpen = value;
 			}
 		}
 		public ApplicationLauncherButton Button;
-		private static bool hasAdded = false;
+		private bool hasAdded = false;
 
 		static Texture2D upArrow;
 		static Texture2D downArrow;
 
-		public void Start()
+        static bool buttonTexLoaded = false;
+        static Texture2D buttonTexture;
+
+        public void Start()
 		{
-			if (!isEnabled)
+#if false
+            if (!HighLogic.CurrentGame.Parameters.CustomParams<BTWCustomParams>().enabled)
+			//if (!isEnabled)
 			{
 				Debug.LogError ("[BetterTimeWarp]: enabled = false in settings, disabling BetterTimeWarp");
-				DestroyImmediate (this);
+				//DestroyImmediate (this);
 				return;
 			}
+#endif
 
 			this.skin = HighLogic.Skin;
 
@@ -71,37 +79,55 @@ namespace BetterTimeWarp
 			upContent = new GUIContent ("", upArrow, "");
 			downContent = new GUIContent ("", downArrow, "");
 			buttonContent = downContent;
+            CreateRectangles();
+            GameEvents.onGameStateSave.Add (SaveSettingsAndCrap);
+            if (!buttonTexLoaded)
+            {
+                buttonTexLoaded = true;
+                buttonTexture = GameDatabase.Instance.GetTexture("BetterTimeWarp/Icons/application", false);
+            }
 
-			GameEvents.onGameStateSave.Add (SaveSettingsAndCrap);
-
-			//add the toolbar button to non-flight scenes
-			if(!hasAdded)
+            //add the toolbar button to non-flight scenes
+            if (!hasAdded && HighLogic.CurrentGame.Parameters.CustomParams<BTWCustomParams>().enabled && !HighLogic.CurrentGame.Parameters.CustomParams<BTWCustomParams>().hideButton)
 			{
-				var buttonTexture = GameDatabase.Instance.GetTexture ("BetterTimeWarp/Icons/application", false);
-				Button = KSP.UI.Screens.ApplicationLauncher.Instance.AddModApplication(
-					new Callback(delegate
-						{
-							BetterTimeWarp.UIOpen = true;
-						}),
+                if (!HighLogic.CurrentGame.Parameters.CustomParams<BTWCustomParams>().hideButtonInFlight || HighLogic.LoadedScene != GameScenes.FLIGHT)
+                {
+                    Button = KSP.UI.Screens.ApplicationLauncher.Instance.AddModApplication(
                     new Callback(delegate
-						{
-							BetterTimeWarp.UIOpen = false;
-						}),
-                    null, null, null, null, KSP.UI.Screens.ApplicationLauncher.AppScenes.SPACECENTER | KSP.UI.Screens.ApplicationLauncher.AppScenes.TRACKSTATION, buttonTexture
-				);
-				KSP.UI.Screens.ApplicationLauncher.Instance.EnableMutuallyExclusive (Button);
-				hasAdded = true;
-			}
+                        {
+                            UIOpen = true;
+                        }),
+                    new Callback(delegate
+                        {
+                            UIOpen = false;
+                        }),
+                    null, null, null, null, ApplicationLauncher.AppScenes.SPACECENTER | ApplicationLauncher.AppScenes.TRACKSTATION | ApplicationLauncher.AppScenes.FLIGHT, buttonTexture
+                );
+                    KSP.UI.Screens.ApplicationLauncher.Instance.EnableMutuallyExclusive(Button);
+                    hasAdded = true;
+                }
+            }
 		}
 		void OnDestroy()
 		{
 			GameEvents.onGameStateSave.Remove (SaveSettingsAndCrap);
-		}
+            removeLauncherButtons();
+        }
 		void SaveSettingsAndCrap(ConfigNode node) //lel
 		{
 			SaveCustomWarpRates ();
 		}
-		void CreateRectangles()
+        public void removeLauncherButtons()
+        {
+            if (Button != null)
+            {
+               // GameEvents.onGUIApplicationLauncherReady.Remove(OnGUIApplicationLauncherReady);
+                ApplicationLauncher.Instance.RemoveModApplication(Button);
+                Button = null;
+            }
+        }
+
+        void CreateRectangles()
 		{
 			if (HighLogic.LoadedSceneIsFlight)
 			{
@@ -140,30 +166,30 @@ namespace BetterTimeWarp
 
 		public void OnGUI()
 		{
-			if (HighLogic.LoadedScene == GameScenes.LOADINGBUFFER)
+			if (HighLogic.LoadedScene == GameScenes.LOADINGBUFFER || HighLogic.LoadedScene == GameScenes.MAINMENU || !HighLogic.CurrentGame.Parameters.CustomParams<BTWCustomParams>().enabled)
 				return;
 
 			if (ShowUI)
 			{
 				GUI.skin = skin;
+				
 
-				CreateRectangles ();
+                //flight
+                if (HighLogic.LoadedSceneIsFlight)
+                {
+                    windowOpen = GUI.Toggle(new Rect(GameSettings.UI_SCALE * 210f /* * ScreenSafeUI.PixelRatio */, 0f, 20f, 20f), windowOpen, buttonContent, skin.button);
+                }
 
-				//flight
-				if (HighLogic.LoadedSceneIsFlight)
-				{
-					windowOpen = GUI.Toggle (new Rect (GameSettings.UI_SCALE * 210f /* * ScreenSafeUI.PixelRatio */, 0f, 20f, 20f), windowOpen, buttonContent, skin.button);
-				}
 				if (windowOpen)
 				{
 					if(!advWindowOpen)
-						GUI.Window (60371, quikWindowRect, QuikWarpWindow, "", windowStyle);
+                        quikWindowRect = GUILayout.Window (60371, quikWindowRect, QuikWarpWindow, "", windowStyle);
 					else
 					{
-						GUI.Window (60372, advWindowRect, TimeWarpWindow, "", windowStyle);
+                        advWindowRect = GUILayout.Window (60372, advWindowRect, TimeWarpWindow, "", windowStyle);
 						if (showPhysicsSettings)
 						{
-							GUI.Window (60373, physSettingsRect, PhysicsSettingsWindow, "", windowStyle);
+                            physSettingsRect = GUILayout.Window (60373, physSettingsRect, PhysicsSettingsWindow, "", windowStyle);
 						}
 					}
 
@@ -241,7 +267,15 @@ namespace BetterTimeWarp
 				InputLockManager.RemoveControlLock ("BetterTimeWarp_UIHover_Lock");
 		}
 
-		public void QuikWarpWindow(int id)
+        bool lockWindow()
+        {
+            if (HighLogic.LoadedScene == GameScenes.FLIGHT && HighLogic.CurrentGame.Parameters.CustomParams<BTWCustomParams>().lockWindowPosInFlight)
+                return true;
+            if (HighLogic.LoadedScene != GameScenes.FLIGHT && HighLogic.CurrentGame.Parameters.CustomParams<BTWCustomParams>().lockWindowPos)
+                return true;
+            return false;
+        }
+        public void QuikWarpWindow(int id)
 		{
 			GUILayout.BeginVertical ();
 
@@ -268,9 +302,11 @@ namespace BetterTimeWarp
 			}
 
 			GUILayout.EndVertical ();
-		}
+            if (!lockWindow())
+                GUI.DragWindow();
+        }
 
-		bool showPhysicsSettings = false;
+        bool showPhysicsSettings = false;
 		string labelColor = "#b7fe00";
 
 		string[] names = new string[]{};
@@ -380,8 +416,12 @@ namespace BetterTimeWarp
 					}
 					else
 					{
-						PopupDialog.SpawnPopupDialog (new MultiOptionDialog("Cannot save because there are non-numbers in the editing fields", "Error", null), false, null);
-					}
+						//PopupDialog.SpawnPopupDialog (new MultiOptionDialog("Cannot save because there are non-numbers in the editing fields", "Error", null), false, null);
+                        var dialog = new MultiOptionDialog("Cannot save because there are non-numbers in the editing fields", "Error", HighLogic.UISkin, new DialogGUIBase[] {
+                                                                                     new DialogGUIButton ("OK", () => { })
+                                                });
+                        PopupDialog.SpawnPopupDialog(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), dialog, false, HighLogic.UISkin, true);
+                    }
 				}
 				if (GUILayout.Button ("Cancel", smallButtonStyle))
 				{
@@ -444,8 +484,14 @@ namespace BetterTimeWarp
 					}
 					else
 					{
-						PopupDialog.SpawnPopupDialog (new MultiOptionDialog("Cannot edit standard warp rates", "Better Time Warp", null), true, null);
-					}
+						//PopupDialog.SpawnPopupDialog (new MultiOptionDialog("Cannot edit standard warp rates", "Better Time Warp", null), true, null);
+
+                        var dialog = new MultiOptionDialog("Cannot edit standard warp rates", "Better Time Warp", HighLogic.UISkin, new DialogGUIBase[] {
+                                                                                     new DialogGUIButton ("OK", () => { })
+                                                });
+                        PopupDialog.SpawnPopupDialog(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), dialog, false, HighLogic.UISkin, true);
+
+                    }
 				}
 				if (currentRates != StandardWarp && currentRates != StandardPhysWarp && GUILayout.Button ("Delete", smallButtonStyle))
 				{
@@ -454,13 +500,33 @@ namespace BetterTimeWarp
 						customWarps.Remove (currentRates);
 						selected = 0;
 						SaveCustomWarpRates ();
-						PopupDialog.SpawnPopupDialog (new MultiOptionDialog("Deleted " + currentRates.Name + " time warp rates", "Better Time Warp", null), true, null);
-						SetWarpRates (StandardWarp, false);
+					//	PopupDialog.SpawnPopupDialog (new MultiOptionDialog("Deleted " + currentRates.Name + " time warp rates", "Better Time Warp", null), true, null);
+
+
+
+                        var dialog = new MultiOptionDialog("Deleted " + currentRates.Name + " time warp rates", "Better Time Warp", HighLogic.UISkin, new DialogGUIBase[] {
+                                                                                     new DialogGUIButton ("OK", () => { 
+                                                           // winState = winContent.close;
+                                                        })
+                                                });
+                        PopupDialog.SpawnPopupDialog(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), dialog, false, HighLogic.UISkin, true);
+                       // winState = winContent.dialog;
+
+
+
+
+                        SetWarpRates(StandardWarp, false);
 					}
 					else
 					{
-						PopupDialog.SpawnPopupDialog (new MultiOptionDialog("Cannot delete standard warp rates", "Better Time Warp", null), true, null);
-					}
+						//PopupDialog.SpawnPopupDialog (new MultiOptionDialog("Cannot delete standard warp rates", "Better Time Warp", null), true, null);
+
+                        var dialog = new MultiOptionDialog("Cannot delete standard warp rates", "Better Time Warp", HighLogic.UISkin, new DialogGUIBase[] {
+                                                                                     new DialogGUIButton ("OK", () => { })
+                                                });
+                        PopupDialog.SpawnPopupDialog(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), dialog, false, HighLogic.UISkin, true);
+
+                    }
 				}
 			}
 			GUILayout.EndScrollView ();
@@ -475,9 +541,11 @@ namespace BetterTimeWarp
 			}
 			showPhysicsSettings = GUILayout.Toggle (showPhysicsSettings, "<color=lime>Physics Settings</color>", skin.button, GUILayout.ExpandWidth(true));
 			GUILayout.EndHorizontal();
-		}
+            if (!lockWindow())
+                GUI.DragWindow();
+        }
 
-		Vector2 physSettingsScroll = new Vector2(0f, 0f);
+        Vector2 physSettingsScroll = new Vector2(0f, 0f);
 
 		string[] toolbar = new string[]{"<color=red>1</color>", "<color=orange>1/2</color>", "<color=yellow>1/3</color>", "<color=lime>1/4</color>"};
 		public void PhysicsSettingsWindow(int id)
@@ -503,8 +571,10 @@ namespace BetterTimeWarp
 			GUILayout.Label ("<b>Physics Timescale:</b> <color=white>" + Time.timeScale + "x</color>");
 
 			GUILayout.EndScrollView ();
-		}
-		void FixedUpdate()
+            if (!lockWindow())
+                GUI.DragWindow();
+        }
+        void FixedUpdate()
 		{
 			if (UseLosslessPhysics && Time.timeScale < 100f)
 			{

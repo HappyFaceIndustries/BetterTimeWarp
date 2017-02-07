@@ -9,5 +9,16 @@
 2.3.2
 	Renamed Settings.dat to BetterTimeWarp.cfg (forgot to rename the file)
 
+2.3.3
+	Moved enabled setting into standard system settings
+	Fixed window from staying open on the main menu
+	Made windows movable
+	Changed mod activation from gameObject.AddComponent<BetterTimeWarp> (); to using the   [KSPAddon(KSPAddon.Startup.FlightAndKSC | KSPAddon.Startup.TrackingStation, false)]
+	Added setting to hide button in all scenes
+	Added setting to hide button in flight
+	Added setting to  lock window positions in Flight
+	Added setting to lock window positions everywhere else
+	Fixed dialogs which didn't have an OK button
+
 ToDo
 	Move enabled setting into standard system settings

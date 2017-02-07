@@ -35,21 +35,24 @@ namespace BetterTimeWarp
                     BetterTimeWarp.SettingsNode.AddNode("BetterTimeWarp");
                 
                 node = BetterTimeWarp.SettingsNode.GetNode("BetterTimeWarp");
-				if (!node.HasValue ("enabled"))
-					node.AddValue ("enabled", "true");
-				
+                //if (!node.HasValue ("enabled"))
+                //	node.AddValue ("enabled", "true");
 
-				//if enabled = false is in the config, disable the mod
-				bool isEnabled = true;
-				if (bool.TryParse (node.GetValue ("enabled"), out isEnabled))
-				{
-					BetterTimeWarp.isEnabled = isEnabled;
-				}
-				if (!isEnabled)
+
+//if enabled = false is in the config, disable the mod
+//bool isEnabled = true;
+//if (bool.TryParse (node.GetValue ("enabled"), out isEnabled))
+//{
+//	BetterTimeWarp.isEnabled = isEnabled;
+//}
+//if (!isEnabled)
+#if false
+                if (!HighLogic.CurrentGame.Parameters.CustomParams<BTWCustomParams>().enabled)
 				{
 					Debug.LogError ("[BetterTimeWarp]: enabled = false in settings, disabling BetterTimeWarp");
 					return;
 				}
+#endif
 				//save the settings, so if they have been regenerated, it exsists and wont cause errors
 				BetterTimeWarp.SettingsNode.Save(BTW_CFG_FILE);
 
@@ -67,13 +70,13 @@ namespace BetterTimeWarp
 					body.timeWarpAltitudeLimits = new float[]{ 0f, 0f, 0f, 0f, 0f, 0f, 100000f, 2000000f };
 				}
 
-				GameEvents.onLevelWasLoadedGUIReady.Add (OnLevelLoaded);
+			//	GameEvents.onLevelWasLoadedGUIReady.Add (OnLevelLoaded);
 
 				started = true;
 			}
 		}
-
-		private void OnLevelLoaded(GameScenes scene)
+#if false
+        private void OnLevelLoaded(GameScenes scene)
 		{
 			//call this every scene that needs BetterTimeWarp
 			if (scene == GameScenes.FLIGHT || scene == GameScenes.SPACECENTER || scene == GameScenes.TRACKSTATION)
@@ -81,7 +84,7 @@ namespace BetterTimeWarp
 				BetterTimeWarp.Instance = gameObject.AddComponent<BetterTimeWarp> ();
 			}
 		}
-
+#endif
 		//called whenever the game autosaves/quicksaves
 		void SaveSettings (Game game)
 		{
