@@ -20,3 +20,5 @@
 	Added setting to lock window positions everywhere else
 	Fixed dialogs which didn't have an OK button
 
+2.3.4
+	Fixed the dropdown icon from covering up the Commnet icons		

@@ -177,7 +177,10 @@ namespace BetterTimeWarp
                 //flight
                 if (HighLogic.LoadedSceneIsFlight)
                 {
-                    windowOpen = GUI.Toggle(new Rect(GameSettings.UI_SCALE * 210f /* * ScreenSafeUI.PixelRatio */, 0f, 20f, 20f), windowOpen, buttonContent, skin.button);
+                    float f = 20f;
+                    if (GameSettings.UI_SCALE >= 1)
+                        f *= GameSettings.UI_SCALE;
+                    windowOpen = GUI.Toggle(new Rect(GameSettings.UI_SCALE * 313f /* * ScreenSafeUI.PixelRatio */, 0f, f, f), windowOpen, buttonContent, skin.button);
                 }
 
 				if (windowOpen)
