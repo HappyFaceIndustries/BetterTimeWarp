@@ -20,5 +20,3 @@
 	Added setting to lock window positions everywhere else
 	Fixed dialogs which didn't have an OK button
 
-ToDo
-	Move enabled setting into standard system settings
