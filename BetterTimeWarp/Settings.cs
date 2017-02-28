@@ -29,6 +29,9 @@ namespace BetterTimeWarp
         [GameParameters.CustomParameterUI("Hide the button in the flight scene?")]
         public bool hideButtonInFlight = true;
 
+        [GameParameters.CustomParameterUI("Hide the dropdown button in the flight scene?")]
+        public bool hideDropdownButtonInFlight = false;
+
         [GameParameters.CustomParameterUI("Lock window positions in flight?")]
         public bool lockWindowPosInFlight = true;
 

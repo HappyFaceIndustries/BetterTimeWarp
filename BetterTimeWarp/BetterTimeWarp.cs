@@ -2,13 +2,13 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
-
+using CommNet;
 using KSP.UI.Screens;
 
 namespace BetterTimeWarp
 {
    
-    [KSPAddon(KSPAddon.Startup.FlightAndKSC | KSPAddon.Startup.TrackingStation, false)]
+    [KSPAddon(KSPAddon.Startup.EveryScene, false)]
     public class BetterTimeWarp : MonoBehaviour
 	{
 		//public static BetterTimeWarp I1nstance;
@@ -48,7 +48,7 @@ namespace BetterTimeWarp
 			{
 				Debug.LogError ("[BetterTimeWarp]: enabled = false in settings, disabling BetterTimeWarp");
 				//DestroyImmediate (this);
-				return;
+				//return;
 			}
 #endif
 
@@ -101,7 +101,7 @@ namespace BetterTimeWarp
                         {
                             UIOpen = false;
                         }),
-                    null, null, null, null, ApplicationLauncher.AppScenes.SPACECENTER | ApplicationLauncher.AppScenes.TRACKSTATION | ApplicationLauncher.AppScenes.FLIGHT, buttonTexture
+                    null, null, null, null, ApplicationLauncher.AppScenes.SPACECENTER | ApplicationLauncher.AppScenes.TRACKSTATION | ApplicationLauncher.AppScenes.FLIGHT | ApplicationLauncher.AppScenes.MAPVIEW, buttonTexture
                 );
                     KSP.UI.Screens.ApplicationLauncher.Instance.EnableMutuallyExclusive(Button);
                     hasAdded = true;
@@ -175,12 +175,36 @@ namespace BetterTimeWarp
 				
 
                 //flight
-                if (HighLogic.LoadedSceneIsFlight)
+                if (HighLogic.LoadedSceneIsFlight && !HighLogic.CurrentGame.Parameters.CustomParams<BTWCustomParams>().hideDropdownButtonInFlight)
                 {
+                    const float ICON_WIDTH = 35;
+                    float y = 207f;
+                    if (CommNetScenario.CommNetEnabled)
+                    {
+                        var activeVessel = FlightGlobals.ActiveVessel;
+                        if (activeVessel.isEVA)
+                        {
+                            y += ICON_WIDTH;
+                        }
+                        else
+                        {
+                            y = 313f;
+                        }
+                    }
+#if false
+                    if (activeVessel.connection.IsConnected)
+                    {
+                        y += ICON_WIDTH;
+                    }
+                    if (activeVessel.connection.Signal != SignalStrength.None)
+                    {
+                        y += ICON_WIDTH;
+                    }
+#endif
                     float f = 20f;
                     if (GameSettings.UI_SCALE >= 1)
                         f *= GameSettings.UI_SCALE;
-                    windowOpen = GUI.Toggle(new Rect(GameSettings.UI_SCALE * 313f /* * ScreenSafeUI.PixelRatio */, 0f, f, f), windowOpen, buttonContent, skin.button);
+                    windowOpen = GUI.Toggle(new Rect(GameSettings.UI_SCALE * y /* * ScreenSafeUI.PixelRatio */, 0f, f, f), windowOpen, buttonContent, skin.button);
                 }
 
 				if (windowOpen)
@@ -278,6 +302,7 @@ namespace BetterTimeWarp
                 return true;
             return false;
         }
+
         public void QuikWarpWindow(int id)
 		{
 			GUILayout.BeginVertical ();
