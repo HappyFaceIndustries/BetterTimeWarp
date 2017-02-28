@@ -28,3 +28,6 @@
 	Fixed dropdown location when Kerbal is on EVA
 	Fixed dropdown location when Commnet is not active
 	Added option to disable dropdown in settings
+
+2.3.5.1
+	Added check for relay when adjusting dropdown

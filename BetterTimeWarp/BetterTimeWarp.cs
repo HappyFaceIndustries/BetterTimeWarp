@@ -190,6 +190,8 @@ namespace BetterTimeWarp
                         {
                             y = 313f;
                         }
+                        if (activeVessel.connection.ControlPath.Last.hopType != activeVessel.connection.ControlPath.First.hopType)
+                            y += ICON_WIDTH;
                     }
 #if false
                     if (activeVessel.connection.IsConnected)
