@@ -31,3 +31,7 @@
 
 2.3.5.1
 	Added check for relay when adjusting dropdown
+
+2.3.5.2
+	Changed checks from circumstances to seeing if the icons are being displayed.
+	Fixed nullrefs when Commnet not enabled in flight scene
