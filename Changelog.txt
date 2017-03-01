@@ -35,3 +35,6 @@
 2.3.5.2
 	Changed checks from circumstances to seeing if the icons are being displayed.
 	Fixed nullrefs when Commnet not enabled in flight scene
+
+2.3.5.3
+	Fixed nullrefs which were occuring during startup

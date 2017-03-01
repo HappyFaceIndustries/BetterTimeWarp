@@ -52,6 +52,11 @@ namespace BetterTimeWarp
 				//return;
 			}
 #endif
+            if (HighLogic.LoadedScene != GameScenes.SPACECENTER &&
+                HighLogic.LoadedScene != GameScenes.FLIGHT &&
+                HighLogic.LoadedScene != GameScenes.TRACKSTATION)
+                return;
+
 
             this.skin = HighLogic.Skin;
 
@@ -167,7 +172,14 @@ namespace BetterTimeWarp
 
         public void OnGUI()
         {
-            if (HighLogic.LoadedScene == GameScenes.LOADINGBUFFER || HighLogic.LoadedScene == GameScenes.MAINMENU || !HighLogic.CurrentGame.Parameters.CustomParams<BTWCustomParams>().enabled)
+            if (HighLogic.LoadedScene <= GameScenes.CREDITS)
+                return;
+            if (HighLogic.LoadedScene != GameScenes.SPACECENTER &&
+                HighLogic.LoadedScene != GameScenes.FLIGHT &&
+                HighLogic.LoadedScene != GameScenes.TRACKSTATION)
+                return;
+
+            if (!HighLogic.CurrentGame.Parameters.CustomParams<BTWCustomParams>().enabled)
                 return;
 
             if (ShowUI)
@@ -187,16 +199,16 @@ namespace BetterTimeWarp
                     if (tu != null && CommNetScenario.CommNetEnabled)
                     {
 
-                        if (tu.arrow_icon.sprite != tu.BLK && tu.arrow_icon.gameObject.activeSelf) y += ICON_WIDTH;
-               
+                        if (tu.arrow_icon != null && tu.arrow_icon.sprite != tu.BLK && tu.arrow_icon.gameObject.activeSelf) y += ICON_WIDTH;
+
                         if (FlightGlobals.ActiveVessel.connection.ControlPath.Last.hopType != FlightGlobals.ActiveVessel.connection.ControlPath.First.hopType)
                         {
-                            if (tu.firstHop_icon.sprite != tu.BLK && tu.arrow_icon.gameObject.activeSelf) y += ICON_WIDTH;
+                            if (tu.firstHop_icon != null && tu.firstHop_icon.sprite != tu.BLK && tu.arrow_icon.gameObject.activeSelf) y += ICON_WIDTH;
                         }
-                        if (tu.lastHop_icon.sprite != tu.BLK && tu.arrow_icon.gameObject.activeSelf) y += ICON_WIDTH;
-                        if (tu.control_icon.sprite != tu.BLK && tu.arrow_icon.gameObject.activeSelf) y += ICON_WIDTH;
-                        if (tu.signal_icon.sprite != tu.BLK && tu.arrow_icon.gameObject.activeSelf) y += ICON_WIDTH;
-                        if (tu.modeButton.gameObject.activeSelf) y += ICON_WIDTH;
+                        if (tu.lastHop_icon != null && tu.lastHop_icon.sprite != tu.BLK && tu.arrow_icon.gameObject.activeSelf) y += ICON_WIDTH;
+                        if (tu.control_icon != null && tu.control_icon.sprite != tu.BLK && tu.arrow_icon.gameObject.activeSelf) y += ICON_WIDTH;
+                        if (tu.signal_icon != null && tu.signal_icon.sprite != tu.BLK && tu.arrow_icon.gameObject.activeSelf) y += ICON_WIDTH;
+                        if (tu.modeButton != null && tu.modeButton.gameObject.activeSelf) y += ICON_WIDTH;
                         Debug.Log("y: " + y.ToString());
                     }
                     float f = 20f;
@@ -684,6 +696,8 @@ namespace BetterTimeWarp
 
         private void LoadCustomWarpRates()
         {
+            if (BetterTimeWarp.SettingsNode == null)
+                BetterTimeWarp.SettingsNode = new ConfigNode();
             if (!SettingsNode.HasNode("BetterTimeWarp"))
                 SettingsNode.AddNode("BetterTimeWarp");
             var node = SettingsNode.GetNode("BetterTimeWarp");
