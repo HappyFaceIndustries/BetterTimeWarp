@@ -38,3 +38,6 @@
 
 2.3.5.3
 	Fixed nullrefs which were occuring during startup
+
+2.3.5.4
+	Removed some log spam

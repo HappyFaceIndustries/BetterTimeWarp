@@ -208,8 +208,7 @@ namespace BetterTimeWarp
                         if (tu.lastHop_icon != null && tu.lastHop_icon.sprite != tu.BLK && tu.arrow_icon.gameObject.activeSelf) y += ICON_WIDTH;
                         if (tu.control_icon != null && tu.control_icon.sprite != tu.BLK && tu.arrow_icon.gameObject.activeSelf) y += ICON_WIDTH;
                         if (tu.signal_icon != null && tu.signal_icon.sprite != tu.BLK && tu.arrow_icon.gameObject.activeSelf) y += ICON_WIDTH;
-                        if (tu.modeButton != null && tu.modeButton.gameObject.activeSelf) y += ICON_WIDTH;
-                        Debug.Log("y: " + y.ToString());
+                        if (tu.modeButton != null && tu.modeButton.gameObject.activeSelf) y += ICON_WIDTH;                        
                     }
                     float f = 20f;
                     if (GameSettings.UI_SCALE >= 1)
