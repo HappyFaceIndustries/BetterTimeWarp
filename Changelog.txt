@@ -44,3 +44,6 @@
 
 2.3.6
 	Fixed nullrefs in orbit when no control
+
+2.3.6.1
+	Fixed nullref when no comms are available, affected positioning of dropdown button	

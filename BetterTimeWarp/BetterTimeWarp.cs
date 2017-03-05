@@ -200,7 +200,7 @@ namespace BetterTimeWarp
                     {
                         if (tu.arrow_icon != null && tu.arrow_icon.sprite != tu.BLK && tu.arrow_icon.gameObject.activeSelf) y += ICON_WIDTH;
 
-                        if (FlightGlobals.ActiveVessel.connection.ControlPath.First != null && FlightGlobals.ActiveVessel.connection.ControlPath.Last != null && FlightGlobals.ActiveVessel.connection.ControlPath.Last.hopType != FlightGlobals.ActiveVessel.connection.ControlPath.First.hopType)
+                        if (FlightGlobals.ActiveVessel.connection != null && FlightGlobals.ActiveVessel.connection.ControlPath.First != null && FlightGlobals.ActiveVessel.connection.ControlPath.Last != null && FlightGlobals.ActiveVessel.connection.ControlPath.Last.hopType != FlightGlobals.ActiveVessel.connection.ControlPath.First.hopType)
                         {
                             if (tu.firstHop_icon != null && tu.firstHop_icon.sprite != tu.BLK && tu.arrow_icon.gameObject.activeSelf) y += ICON_WIDTH;
                         }
