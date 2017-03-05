@@ -41,3 +41,6 @@
 
 2.3.5.4
 	Removed some log spam
+
+2.3.6
+	Fixed nullrefs in orbit when no control
