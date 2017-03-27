@@ -185,8 +185,7 @@ namespace BetterTimeWarp
             if (ShowUI)
             {
                 GUI.skin = skin;
-
-
+                
                 //flight
                 if (HighLogic.LoadedSceneIsFlight && !HighLogic.CurrentGame.Parameters.CustomParams<BTWCustomParams>().hideDropdownButtonInFlight)
                 {
@@ -212,7 +211,9 @@ namespace BetterTimeWarp
                     float f = 20f;
                     if (GameSettings.UI_SCALE >= 1)
                         f *= GameSettings.UI_SCALE;
-                    windowOpen = GUI.Toggle(new Rect(GameSettings.UI_SCALE * y /* * ScreenSafeUI.PixelRatio */, 0f, f, f), windowOpen, buttonContent, skin.button);
+
+                    if (buttonContent != null)
+                        windowOpen = GUI.Toggle(new Rect(GameSettings.UI_SCALE * y /* * ScreenSafeUI.PixelRatio */, 0f, f, f), windowOpen, buttonContent, skin.button);
                 }
 
                 if (windowOpen)
@@ -615,7 +616,10 @@ namespace BetterTimeWarp
             if (UseLosslessPhysics && Time.timeScale < 100f)
             {
                 if (Time.timeScale >= LosslessUpperThreshold)
+                {
                     Time.fixedDeltaTime = LosslessUpperThreshold * 0.02f;
+                    Planetarium.fetch.fixedDeltaTime = Time.fixedDeltaTime;
+                }
             }
         }
 
