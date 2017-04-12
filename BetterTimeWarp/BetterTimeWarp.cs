@@ -6,6 +6,8 @@ using CommNet;
 using KSP.UI.Screens;
 using KSP.UI.Screens.Flight;
 
+using System.Reflection;
+
 namespace BetterTimeWarp
 {
 
@@ -87,6 +89,8 @@ namespace BetterTimeWarp
             buttonContent = downContent;
             CreateRectangles();
             GameEvents.onGameStateSave.Add(SaveSettingsAndCrap);
+            GameEvents.onTimeWarpRateChanged.Add(onTimeWarpRateChanged);
+
             if (!buttonTexLoaded)
             {
                 buttonTexLoaded = true;
@@ -117,6 +121,7 @@ namespace BetterTimeWarp
         void OnDestroy()
         {
             GameEvents.onGameStateSave.Remove(SaveSettingsAndCrap);
+            GameEvents.onTimeWarpRateChanged.Remove(onTimeWarpRateChanged);
             removeLauncherButtons();
         }
         void SaveSettingsAndCrap(ConfigNode node) //lel
@@ -133,6 +138,58 @@ namespace BetterTimeWarp
             }
         }
 
+        static float lastWarpRate = 1;
+        void onTimeWarpRateChanged()
+        {
+            if (TimeWarp.fetch != null)
+            {
+                Log.Info("New time warp: " + TimeWarp.fetch.warpRates[TimeWarp.fetch.current_rate_index].ToString());
+
+                if (TimeWarp.fetch.warpRates[TimeWarp.fetch.current_rate_index] == 1)
+                {
+                    Log.Info("lastWarpRate: " + lastWarpRate.ToString());
+                    if (lastWarpRate > 100000f)
+                    {
+                        foreach (var p in FlightGlobals.ActiveVessel.parts)
+                        {
+                            
+                            foreach (PartModule tmpPM in p.Modules)
+                            {
+
+                                // Find all modules of type BaseConvertor
+                                // If !IsActivated, then 
+                                // set lastUpdateTime = Planetarium.GetUniversalTime();
+                                // lastUpdateTime is a protected field, so Reflection was needed to fix this
+
+                                switch (tmpPM.moduleName)
+                                {
+                                    case "FissionReactor":
+                                    case "KFAPUController":
+                                    case "ModuleResourceConverter":
+                                        ModuleResourceConverter tmpGen = (ModuleResourceConverter)tmpPM;
+                                        Log.Info("Module: " + tmpGen.moduleName + " IsActivated: " + tmpGen.IsActivated.ToString());
+                                        if (!tmpGen.IsActivated)
+                                        {
+                                            FieldInfo fi = tmpGen.GetType().GetField("lastUpdateTime", BindingFlags.NonPublic | BindingFlags.Instance);
+                                            if (fi != null)
+                                                fi.SetValue(tmpGen, Planetarium.GetUniversalTime());
+                                        }
+
+                                        break;
+
+                                }
+                            }
+                        }
+                        lastWarpRate = 1;
+                    }
+
+                }
+                else
+                {
+                    lastWarpRate = Math.Max(lastWarpRate, TimeWarp.fetch.warpRates[TimeWarp.fetch.current_rate_index]);
+                }
+            }
+        }
         void CreateRectangles()
         {
             if (HighLogic.LoadedSceneIsFlight)
@@ -185,7 +242,7 @@ namespace BetterTimeWarp
             if (ShowUI)
             {
                 GUI.skin = skin;
-                
+
                 //flight
                 if (HighLogic.LoadedSceneIsFlight && !HighLogic.CurrentGame.Parameters.CustomParams<BTWCustomParams>().hideDropdownButtonInFlight)
                 {
@@ -195,19 +252,23 @@ namespace BetterTimeWarp
                     float y = ICON_BASE;
 
                     var tu = TelemetryUpdate.Instance;
+
                     if (tu != null && CommNetScenario.CommNetEnabled)
                     {
                         if (tu.arrow_icon != null && tu.arrow_icon.sprite != tu.BLK && tu.arrow_icon.gameObject.activeSelf) y += ICON_WIDTH;
 
                         if (FlightGlobals.ActiveVessel.connection != null && FlightGlobals.ActiveVessel.connection.ControlPath.First != null && FlightGlobals.ActiveVessel.connection.ControlPath.Last != null && FlightGlobals.ActiveVessel.connection.ControlPath.Last.hopType != FlightGlobals.ActiveVessel.connection.ControlPath.First.hopType)
                         {
-                            if (tu.firstHop_icon != null && tu.firstHop_icon.sprite != tu.BLK && tu.arrow_icon.gameObject.activeSelf) y += ICON_WIDTH;
+                            if (tu.firstHop_icon != null && tu.firstHop_icon.sprite != tu.BLK && tu.firstHop_icon.gameObject.activeSelf) y += ICON_WIDTH;
                         }
-                        if (tu.lastHop_icon != null && tu.lastHop_icon.sprite != tu.BLK && tu.arrow_icon.gameObject.activeSelf) y += ICON_WIDTH;
-                        if (tu.control_icon != null && tu.control_icon.sprite != tu.BLK && tu.arrow_icon.gameObject.activeSelf) y += ICON_WIDTH;
-                        if (tu.signal_icon != null && tu.signal_icon.sprite != tu.BLK && tu.arrow_icon.gameObject.activeSelf) y += ICON_WIDTH;
-                        if (tu.modeButton != null && tu.modeButton.gameObject.activeSelf) y += ICON_WIDTH;                        
+                        if (tu.lastHop_icon != null && tu.lastHop_icon.sprite != tu.BLK && tu.lastHop_icon.gameObject.activeSelf) y += ICON_WIDTH;
+                        if (tu.control_icon != null && tu.control_icon.sprite != tu.BLK && tu.control_icon.gameObject.activeSelf) y += ICON_WIDTH;
+                        if (tu.signal_icon != null && tu.signal_icon.sprite != tu.BLK && tu.signal_icon.gameObject.activeSelf) y += ICON_WIDTH;
+                        if (tu.modeButton != null && tu.modeButton.gameObject.activeSelf) y += ICON_WIDTH;
                     }
+                    // if only a single icon, then adjustment needed
+                    if (y == ICON_BASE + ICON_WIDTH)
+                        y += 12;
                     float f = 20f;
                     if (GameSettings.UI_SCALE >= 1)
                         f *= GameSettings.UI_SCALE;

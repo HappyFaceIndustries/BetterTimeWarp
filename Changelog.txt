@@ -47,3 +47,13 @@
 
 2.3.6.1
 	Fixed nullref when no comms are available, affected positioning of dropdown button	
+
+2.3.6.2
+	Replaced "s" button with icons
+
+2.3.6.3
+	Fixed Physicless warp so that all use the same timestep
+
+2.3.7
+	Fixed dropdown offset for when no probe control
+	Fixed issue when timewarping >stock max, Inactive Resource Convertors could use fuel more rapidly
