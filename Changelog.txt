@@ -56,4 +56,7 @@
 
 2.3.7
 	Fixed dropdown offset for when no probe control
-	Fixed issue when timewarping >stock max, Inactive Resource Convertors could use fuel more rapidly
+	Fixed issue when timewarping >stock max, Inactive Resource Converters could use fuel more rapidly
+
+2.3.7.1
+	Now looks at all vesselsLoaded when fixing the ResourceConverter problem

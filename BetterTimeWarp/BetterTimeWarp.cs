@@ -150,33 +150,35 @@ namespace BetterTimeWarp
                     Log.Info("lastWarpRate: " + lastWarpRate.ToString());
                     if (lastWarpRate > 100000f)
                     {
-                        foreach (var p in FlightGlobals.ActiveVessel.parts)
+                        foreach (var v in FlightGlobals.fetch.vesselsLoaded)
                         {
-                            
-                            foreach (PartModule tmpPM in p.Modules)
+                            foreach (var p in v.parts)
                             {
-
-                                // Find all modules of type BaseConvertor
-                                // If !IsActivated, then 
-                                // set lastUpdateTime = Planetarium.GetUniversalTime();
-                                // lastUpdateTime is a protected field, so Reflection was needed to fix this
-
-                                switch (tmpPM.moduleName)
+                                foreach (PartModule tmpPM in p.Modules)
                                 {
-                                    case "FissionReactor":
-                                    case "KFAPUController":
-                                    case "ModuleResourceConverter":
-                                        ModuleResourceConverter tmpGen = (ModuleResourceConverter)tmpPM;
-                                        Log.Info("Module: " + tmpGen.moduleName + " IsActivated: " + tmpGen.IsActivated.ToString());
-                                        if (!tmpGen.IsActivated)
-                                        {
-                                            FieldInfo fi = tmpGen.GetType().GetField("lastUpdateTime", BindingFlags.NonPublic | BindingFlags.Instance);
-                                            if (fi != null)
-                                                fi.SetValue(tmpGen, Planetarium.GetUniversalTime());
-                                        }
 
-                                        break;
+                                    // Find all modules of type BaseConvertor
+                                    // If !IsActivated, then 
+                                    // set lastUpdateTime = Planetarium.GetUniversalTime();
+                                    // lastUpdateTime is a protected field, so Reflection was needed to fix this
 
+                                    switch (tmpPM.moduleName)
+                                    {
+                                        case "FissionReactor":
+                                        case "KFAPUController":
+                                        case "ModuleResourceConverter":
+                                            ModuleResourceConverter tmpGen = (ModuleResourceConverter)tmpPM;
+                                            Log.Info("Module: " + tmpGen.moduleName + " IsActivated: " + tmpGen.IsActivated.ToString());
+                                            if (!tmpGen.IsActivated)
+                                            {
+                                                FieldInfo fi = tmpGen.GetType().GetField("lastUpdateTime", BindingFlags.NonPublic | BindingFlags.Instance);
+                                                if (fi != null)
+                                                    fi.SetValue(tmpGen, Planetarium.GetUniversalTime());
+                                            }
+
+                                            break;
+
+                                    }
                                 }
                             }
                         }
