@@ -19,13 +19,24 @@ namespace BetterTimeWarp
 		public TimeWarpRates()
 		{
 		}
+        
+        public static string rateFmt(float f)
+        {
+            
+                if (f < 1f)
+                    return "F";
+                else
+                    return "N0";
+            
+        }
 
 		public override string ToString ()
 		{
-			string ratesString = "";
+			string ratesString = "";;
 			foreach (float f in this.Rates)
 			{
-				ratesString += f.ToString () + ", ";
+
+				ratesString += f.ToString (rateFmt(f)) + ", ";
 			}
 			ratesString.Remove (ratesString.Length - 3);
 			return this.Name + " - " + ratesString;

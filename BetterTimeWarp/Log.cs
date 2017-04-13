@@ -21,7 +21,7 @@ namespace BetterTimeWarp
 
         public static LEVEL level = LEVEL.INFO;
 
-        private static readonly String PREFIX = "WernerChecker" + ": ";
+        private static readonly String PREFIX = "BetterTimeWarp" + ": ";
 
         public static LEVEL GetLevel()
         {

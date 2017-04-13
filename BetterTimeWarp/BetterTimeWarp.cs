@@ -8,10 +8,13 @@ using KSP.UI.Screens.Flight;
 
 using System.Reflection;
 
+//using NearFutureElectrical;
+
 namespace BetterTimeWarp
 {
 
-    [KSPAddon(KSPAddon.Startup.EveryScene, false)]
+//    [KSPAddon(KSPAddon.Startup.EveryScene, false)]
+    [KSPAddon(KSPAddon.Startup.SpaceCentre, true)]
     public class BetterTimeWarp : MonoBehaviour
     {
         //public static BetterTimeWarp I1nstance;
@@ -45,15 +48,7 @@ namespace BetterTimeWarp
 
         public void Start()
         {
-#if false
-            if (!HighLogic.CurrentGame.Parameters.CustomParams<BTWCustomParams>().enabled)
-			//if (!isEnabled)
-			{
-				Debug.LogError ("[BetterTimeWarp]: enabled = false in settings, disabling BetterTimeWarp");
-				//DestroyImmediate (this);
-				//return;
-			}
-#endif
+            DontDestroyOnLoad(this);
             if (HighLogic.LoadedScene != GameScenes.SPACECENTER &&
                 HighLogic.LoadedScene != GameScenes.FLIGHT &&
                 HighLogic.LoadedScene != GameScenes.TRACKSTATION)
@@ -66,7 +61,7 @@ namespace BetterTimeWarp
 
             SetWarpRates(CurrentWarp, false);
             SetWarpRates(CurrentPhysWarp, false);
-
+            InitW();
             windowStyle = new GUIStyle(skin.window);
             windowStyle.padding.left = 5;
             windowStyle.padding.right = 5;
@@ -90,6 +85,8 @@ namespace BetterTimeWarp
             CreateRectangles();
             GameEvents.onGameStateSave.Add(SaveSettingsAndCrap);
             GameEvents.onTimeWarpRateChanged.Add(onTimeWarpRateChanged);
+            GameEvents.onPartUnpack.Add(onPartUnpack);
+            GameEvents.onLevelWasLoadedGUIReady.Add(onLevelWasLoadedGUIReady);
 
             if (!buttonTexLoaded)
             {
@@ -118,87 +115,166 @@ namespace BetterTimeWarp
                 }
             }
         }
+
+        void onLevelWasLoadedGUIReady(GameScenes scene)
+        {
+            CreateRectangles();
+            //currWarpIndex = 0;
+            //currPhysIndex = 0;
+            //SetWarpRates(warpRates[currWarpIndex]);
+            //if (warpRates[currWarpIndex] != CurrentWarp)
+            {
+                SetWarpRates(warpRates[currWarpIndex]);
+            }
+           // if (physRates[currPhysIndex] != CurrentPhysWarp)
+            {
+                SetWarpRates(physRates[currPhysIndex]);
+            }
+
+        }
+
         void OnDestroy()
         {
             GameEvents.onGameStateSave.Remove(SaveSettingsAndCrap);
             GameEvents.onTimeWarpRateChanged.Remove(onTimeWarpRateChanged);
+            GameEvents.onPartUnpack.Remove(onPartUnpack);
+            GameEvents.onLevelWasLoadedGUIReady.Remove(onLevelWasLoadedGUIReady);
             removeLauncherButtons();
         }
+
         void SaveSettingsAndCrap(ConfigNode node) //lel
         {
             SaveCustomWarpRates();
         }
+
         public void removeLauncherButtons()
         {
             if (Button != null)
             {
-                // GameEvents.onGUIApplicationLauncherReady.Remove(OnGUIApplicationLauncherReady);
                 ApplicationLauncher.Instance.RemoveModApplication(Button);
                 Button = null;
             }
         }
 
-        static float lastWarpRate = 1;
+        void InitW()
+        {
+            w[1] = "10";
+            w[2] = "100";
+            w[3] = "1000";
+            w[4] = "10000";
+            w[5] = "100000";
+            w[6] = "1000000";
+            w[7] = "10000000";
+        }
+        List<Part> resourceConverterParts = new List<Part>();
+
+        // When coming out of warp, fix issue with ResourceConverter
+        void onPartUnpack(Part p)
+        {
+            Log.Info("Unpacking part: " + p.partInfo.name);
+            if (resourceConverterParts.Contains(p))
+            {
+                resourceConverterParts.Remove(p);
+                foreach (PartModule tmpPM in p.Modules)
+                {
+
+                    // Find all modules of type BaseConvertor
+                    // If !IsActivated, then 
+                    // set lastUpdateTime = Planetarium.GetUniversalTime();
+                    // lastUpdateTime is a protected field, so Reflection was needed to fix this
+
+                    switch (tmpPM.moduleName)
+                    {
+                        case "FissionReactor":
+                        case "KFAPUController":
+                        case "ModuleResourceConverter":
+                            ModuleResourceConverter tmpGen = (ModuleResourceConverter)tmpPM;
+                            Log.Info("Module: " + tmpGen.moduleName + " IsActivated: " + tmpGen.IsActivated.ToString());
+                           // if (!tmpGen.IsActivated)
+                            {
+                                FieldInfo fi = tmpGen.GetType().GetField("lastUpdateTime", BindingFlags.NonPublic | BindingFlags.Instance);
+                                if (fi != null)
+                                {
+                                    Log.Info("Updating lastUpdateTime");
+                                    fi.SetValue(tmpGen, Planetarium.GetUniversalTime());
+                                }
+                                else
+                                    Log.Info("Unable to get pointer to lastUpdateTime");
+                            }
+
+                            break;
+
+                    }
+                }
+            }
+        }
+
+        
+        static int lastWarpRateIdx = 0;
         void onTimeWarpRateChanged()
         {
             if (TimeWarp.fetch != null)
             {
-                Log.Info("New time warp: " + TimeWarp.fetch.warpRates[TimeWarp.fetch.current_rate_index].ToString());
+                //Log.Info("TimeWarp.fetch.current_rate_index: " + TimeWarp.fetch.current_rate_index.ToString() + "    New time warp: " + TimeWarp.fetch.warpRates[TimeWarp.fetch.current_rate_index].ToString() + "    lastWarpRate: " + lastWarpRate.ToString());
 
-                if (TimeWarp.fetch.warpRates[TimeWarp.fetch.current_rate_index] == 1)
+                if (lastWarpRateIdx > 0 && TimeWarp.fetch.warpRates[TimeWarp.fetch.current_rate_index] > 1)
                 {
-                    Log.Info("lastWarpRate: " + lastWarpRate.ToString());
-                    if (lastWarpRate > 100000f)
+                    foreach (var v in FlightGlobals.fetch.vesselsLoaded)
                     {
-                        foreach (var v in FlightGlobals.fetch.vesselsLoaded)
+                        foreach (var p in v.Parts)
                         {
-                            foreach (var p in v.parts)
+                            foreach (PartModule tmpPM in p.Modules)
                             {
-                                foreach (PartModule tmpPM in p.Modules)
+
+                                // Find all modules of type BaseConvertor which are inactive
+
+                                switch (tmpPM.moduleName)
                                 {
-
-                                    // Find all modules of type BaseConvertor
-                                    // If !IsActivated, then 
-                                    // set lastUpdateTime = Planetarium.GetUniversalTime();
-                                    // lastUpdateTime is a protected field, so Reflection was needed to fix this
-
-                                    switch (tmpPM.moduleName)
-                                    {
-                                        case "FissionReactor":
-                                        case "KFAPUController":
-                                        case "ModuleResourceConverter":
-                                            ModuleResourceConverter tmpGen = (ModuleResourceConverter)tmpPM;
-                                            Log.Info("Module: " + tmpGen.moduleName + " IsActivated: " + tmpGen.IsActivated.ToString());
-                                            if (!tmpGen.IsActivated)
+                                    case "FissionReactor":
+                                    case "KFAPUController":
+                                    case "ModuleResourceConverter":
+                                        ModuleResourceConverter tmpGen = (ModuleResourceConverter)tmpPM;
+                                        Log.Info("Module: " + tmpGen.moduleName + " IsActivated: " + tmpGen.IsActivated.ToString());
+                                        if (!tmpGen.IsActivated)
+                                        {
+                                            if (!resourceConverterParts.Contains(p))
+                                                resourceConverterParts.Add(p);
+                                        }
+                                        else
+                                        {
+                                            if (resourceConverterParts.Contains(p))
                                             {
+                                                resourceConverterParts.Remove(p);
                                                 FieldInfo fi = tmpGen.GetType().GetField("lastUpdateTime", BindingFlags.NonPublic | BindingFlags.Instance);
                                                 if (fi != null)
+                                                {
+                                                    Log.Info("Updating lastUpdateTime");
                                                     fi.SetValue(tmpGen, Planetarium.GetUniversalTime());
+                                                }
+                                                else
+                                                    Log.Info("Unable to get pointer to lastUpdateTime");
                                             }
+                                        }
+                                        break;
 
-                                            break;
-
-                                    }
                                 }
                             }
                         }
-                        lastWarpRate = 1;
-                    }
-
+                    }                    
                 }
-                else
-                {
-                    lastWarpRate = Math.Max(lastWarpRate, TimeWarp.fetch.warpRates[TimeWarp.fetch.current_rate_index]);
-                }
+               
+                lastWarpRateIdx = TimeWarp.fetch.current_rate_index;
+               
             }
         }
+
         void CreateRectangles()
         {
             if (HighLogic.LoadedSceneIsFlight)
             {
-                quikWindowRect = new Rect(GameSettings.UI_SCALE * 210f /* * ScreenSafeUI.PixelRatio */, 20f, 200f, 410f);
-                advWindowRect = new Rect(GameSettings.UI_SCALE * 210f /* * ScreenSafeUI.PixelRatio */, 20f, 420f, 410f);
-                physSettingsRect = new Rect(GameSettings.UI_SCALE * 210f /* * ScreenSafeUI.PixelRatio */, 430f, 420f, 220f);
+                quikWindowRect = new Rect(GameSettings.UI_SCALE * 210f /* * ScreenSafeUI.PixelRatio */, 35f, 200f, 410f);
+                advWindowRect = new Rect(GameSettings.UI_SCALE * 210f /* * ScreenSafeUI.PixelRatio */, 35f, 420f, 410f);
+                physSettingsRect = new Rect(GameSettings.UI_SCALE * 210f /* * ScreenSafeUI.PixelRatio */, 445f, 420f, 220f);
             }
             else
             {
@@ -276,7 +352,16 @@ namespace BetterTimeWarp
                         f *= GameSettings.UI_SCALE;
 
                     if (buttonContent != null)
-                        windowOpen = GUI.Toggle(new Rect(GameSettings.UI_SCALE * y /* * ScreenSafeUI.PixelRatio */, 0f, f, f), windowOpen, buttonContent, skin.button);
+                    {
+                        var b = GUI.Toggle(new Rect(GameSettings.UI_SCALE * y /* * ScreenSafeUI.PixelRatio */, 0f, f, f), windowOpen, buttonContent, skin.button);
+                        if (b != windowOpen)
+                        {
+                            windowOpen = b;
+
+                           // CreateRectangles();
+                        }
+                        
+                    }
                 }
 
                 if (windowOpen)
@@ -305,6 +390,7 @@ namespace BetterTimeWarp
 
         string warpName = "Name";
         bool physics = false;
+#if false
         string w1 = "10";
         string w2 = "100";
         string w3 = "1000";
@@ -312,6 +398,7 @@ namespace BetterTimeWarp
         string w5 = "100000";
         string w6 = "1000000";
         string w7 = "10000000";
+#endif
 
         TimeWarpRates currentRates = StandardWarp;
         int selected = 0;
@@ -409,6 +496,8 @@ namespace BetterTimeWarp
         bool showPhysicsSettings = false;
         string labelColor = "#b7fe00";
 
+        string[] w = new string[8];
+
         string[] names = new string[] { };
         public void TimeWarpWindow(int id)
         {
@@ -419,7 +508,11 @@ namespace BetterTimeWarp
 
             editToggle = GUILayout.Toggle(editToggle, "Create", skin.button);
             selected = GUILayout.SelectionGrid(selected, names, 1, smallButtonStyle);
-            currentRates = customWarps.Find(r => r.Name == names[selected] || names[selected].Split('<', '>').Contains(r.Name));
+
+            currentRates = customWarps.Find(r => r.Name == names[selected] ||
+                (names[selected].Contains("<") && names[selected].Split('<', '>')[2] == r.Name)
+                );
+
             if (currentRates == null)
                 currentRates = StandardWarp;
 
@@ -432,10 +525,17 @@ namespace BetterTimeWarp
 
             if (editToggle)
             {
+                bool canExport = true;
+
                 GUILayout.BeginVertical(GUILayout.ExpandHeight(true));
 
-                bool canExport = true;
                 warpName = GUILayout.TextField(warpName);
+                for (int i = 1; i < 8; i++)
+                {
+                    if (i < 4 || !physics)
+                        w[i] = GUILayout.TextField(w[i]);
+                }
+#if false
                 w1 = GUILayout.TextField(w1);
                 w2 = GUILayout.TextField(w2);
                 w3 = GUILayout.TextField(w3);
@@ -446,6 +546,7 @@ namespace BetterTimeWarp
                     w6 = GUILayout.TextField(w6);
                     w7 = GUILayout.TextField(w7);
                 }
+#endif
                 physics = GUILayout.Toggle(physics, "Physics Warp?");
 
                 GUILayout.EndVertical();
@@ -459,6 +560,19 @@ namespace BetterTimeWarp
                         rates = new float[8];
 
                     rates[0] = 1f;
+
+                    float pw;
+                    for (int i = 1; i < 8; i++)
+                    {
+                        if (i < 4 || !physics)
+                        {
+                            if (float.TryParse(w[i], out pw))
+                                rates[i] = pw;
+                            else
+                                canExport = false;
+                        }
+                    }
+#if false
                     float pw1;
                     if (float.TryParse(w1, out pw1))
                         rates[1] = pw1;
@@ -497,6 +611,7 @@ namespace BetterTimeWarp
                         else
                             canExport = false;
                     }
+#endif
                     if (canExport)
                     {
                         TimeWarpRates timeWarpRates = new TimeWarpRates(warpName, rates, physics);
@@ -506,13 +621,16 @@ namespace BetterTimeWarp
                         //SetWarpRates (timeWarpRates);
                         warpName = "Name";
                         physics = false;
-                        w1 = "10";
-                        w2 = "100";
-                        w3 = "1000";
-                        w4 = "10000";
-                        w5 = "100000";
-                        w6 = "1000000";
-                        w7 = "10000000";
+                        InitW();
+#if false
+                        w[1] = "10";
+                        w[2] = "100";
+                        w[3] = "1000";
+                        w[4] = "10000";
+                        w[5] = "100000";
+                        w[6] = "1000000";
+                        w[7] = "10000000";
+#endif
                     }
                     else
                     {
@@ -528,29 +646,42 @@ namespace BetterTimeWarp
                     editToggle = false;
                     warpName = "Name";
                     physics = false;
-                    w1 = "10";
-                    w2 = "100";
-                    w3 = "1000";
-                    w4 = "10000";
-                    w5 = "100000";
-                    w6 = "1000000";
-                    w7 = "10000000";
+                    InitW();
+#if false
+                    w[1] = "10";
+                    w[2] = "100";
+                    w[3] = "1000";
+                    w[4] = "10000";
+                    w[5] = "100000";
+                    w[6] = "1000000";
+                    w[7] = "10000000";
+#endif
                 }
             }
             else
             {
                 GUILayout.BeginVertical(GUILayout.ExpandHeight(true));
-                GUILayout.Label("<b><color=lime>1:</color></b> <color=white>" + currentRates.Rates[0].ToString() + "x</color>");
-                GUILayout.Label("<b><color=lime>2:</color></b> <color=white>" + currentRates.Rates[1].ToString() + "x</color>");
-                GUILayout.Label("<b><color=lime>3:</color></b> <color=white>" + currentRates.Rates[2].ToString() + "x</color>");
-                GUILayout.Label("<b><color=lime>4:</color></b> <color=white>" + currentRates.Rates[3].ToString() + "x</color>");
+                for (int i = 1; i <= 8; i++)
+                {
+                    if (i <= 4 || !currentRates.Physics)
+                    {
+                        var f = currentRates.Rates[i - 1];
+                        GUILayout.Label("<b><color=lime>" + i.ToString() + ":</color></b> <color=white>" + f.ToString(TimeWarpRates.rateFmt(f)) + "x</color>");
+                    }
+                }
+#if false
+                GUILayout.Label("<b><color=lime>1:</color></b> <color=white>" + currentRates.Rates[0].ToString(TimeWarpRates.rateFmt(currentRates.Rates[0]) + "x</color>");
+                GUILayout.Label("<b><color=lime>2:</color></b> <color=white>" + currentRates.Rates[1].ToString("N0") + "x</color>");
+                GUILayout.Label("<b><color=lime>3:</color></b> <color=white>" + currentRates.Rates[2].ToString("N0") + "x</color>");
+                GUILayout.Label("<b><color=lime>4:</color></b> <color=white>" + currentRates.Rates[3].ToString("N0") + "x</color>");
                 if (!currentRates.Physics)
                 {
-                    GUILayout.Label("<b><color=lime>5:</color></b> <color=white>" + currentRates.Rates[4].ToString() + "x</color>");
-                    GUILayout.Label("<b><color=lime>6:</color></b> <color=white>" + currentRates.Rates[5].ToString() + "x</color>");
-                    GUILayout.Label("<b><color=lime>7:</color></b> <color=white>" + currentRates.Rates[6].ToString() + "x</color>");
-                    GUILayout.Label("<b><color=lime>8:</color></b> <color=white>" + currentRates.Rates[7].ToString() + "x</color>");
+                    GUILayout.Label("<b><color=lime>5:</color></b> <color=white>" + currentRates.Rates[4].ToString("N0") + "x</color>");
+                    GUILayout.Label("<b><color=lime>6:</color></b> <color=white>" + currentRates.Rates[5].ToString("N0") + "x</color>");
+                    GUILayout.Label("<b><color=lime>7:</color></b> <color=white>" + currentRates.Rates[6].ToString("N0") + "x</color>");
+                    GUILayout.Label("<b><color=lime>8:</color></b> <color=white>" + currentRates.Rates[7].ToString("N0") + "x</color>");
                 }
+#endif
                 GUILayout.EndVertical();
 
                 GUILayout.Space(15f);
@@ -570,16 +701,24 @@ namespace BetterTimeWarp
                         editToggle = true;
                         warpName = currentRates.Name;
                         physics = currentRates.Physics;
-                        w1 = currentRates.Rates[1].ToString();
-                        w2 = currentRates.Rates[2].ToString();
-                        w3 = currentRates.Rates[3].ToString();
+
+                        for (int i = 1; i < 8; i ++)
+                        {
+                            if (i < 4 || !physics)
+                                w[i] = currentRates.Rates[i].ToString(TimeWarpRates.rateFmt(currentRates.Rates[i]));
+                        }
+#if false
+                        w1 = currentRates.Rates[1].ToString(TimeWarpRates.rateFmt(currentRates.Rates[1]));
+                        w2 = currentRates.Rates[2].ToString(TimeWarpRates.rateFmt(currentRates.Rates[2]));
+                        w3 = currentRates.Rates[3].ToString(TimeWarpRates.rateFmt(currentRates.Rates[3]));
                         if (!physics)
                         {
-                            w4 = currentRates.Rates[4].ToString();
-                            w5 = currentRates.Rates[5].ToString();
-                            w6 = currentRates.Rates[6].ToString();
-                            w7 = currentRates.Rates[7].ToString();
+                            w4 = currentRates.Rates[4].ToString(TimeWarpRates.rateFmt(currentRates.Rates[4]));
+                            w5 = currentRates.Rates[5].ToString(TimeWarpRates.rateFmt(currentRates.Rates[5]));
+                            w6 = currentRates.Rates[6].ToString(TimeWarpRates.rateFmt(currentRates.Rates[6]));
+                            w7 = currentRates.Rates[7].ToString(TimeWarpRates.rateFmt(currentRates.Rates[7]));
                         }
+#endif
                         selected = 0;
                     }
                     else
@@ -674,6 +813,7 @@ namespace BetterTimeWarp
             if (!lockWindow())
                 GUI.DragWindow();
         }
+
         void FixedUpdate()
         {
             if (UseLosslessPhysics && Time.timeScale < 100f)
@@ -791,6 +931,14 @@ namespace BetterTimeWarp
                 else
                     rates = new float[8];
                 rates[0] = 1f;
+                for (int i = 1; i < 8; i++)
+                {
+                    if (i < 4 || !physics)
+                    {
+                        rates[i] = float.Parse(cNode.GetValue("warpRate" + i.ToString()));
+                    }
+                }
+#if false
                 rates[1] = float.Parse(cNode.GetValue("warpRate1"));
                 rates[2] = float.Parse(cNode.GetValue("warpRate2"));
                 rates[3] = float.Parse(cNode.GetValue("warpRate3"));
@@ -801,6 +949,7 @@ namespace BetterTimeWarp
                     rates[6] = float.Parse(cNode.GetValue("warpRate6"));
                     rates[7] = float.Parse(cNode.GetValue("warpRate7"));
                 }
+#endif
                 customWarps.Add(new TimeWarpRates(name, rates, physics));
             }
 
@@ -811,7 +960,7 @@ namespace BetterTimeWarp
             //load selected rates
             string currentTimeWarp = StandardWarp.Name;
             string currentPhysWarp = StandardPhysWarp.Name;
-
+            
             if (node.HasValue("CurrentTimeWarp"))
                 currentTimeWarp = node.GetValue("CurrentTimeWarp");
             if (node.HasValue("CurrentPhysWarp"))
@@ -827,6 +976,7 @@ namespace BetterTimeWarp
             if (CurrentPhysWarp == null)
                 CurrentPhysWarp = StandardPhysWarp;
         }
+
         private void SaveCustomWarpRates()
         {
             if (!SettingsNode.HasNode("BetterTimeWarp"))
@@ -845,6 +995,14 @@ namespace BetterTimeWarp
                 {
                     ConfigNode rateNode = new ConfigNode("CustomWarpRate");
                     rateNode.AddValue("name", rates.Name);
+                    for (int i = 1; i < 8; i ++)
+                    {
+                        if (i < 4 || !rates.Physics)
+                        {
+                            rateNode.AddValue("warpRate" + i.ToString(), rates.Rates[i].ToString(TimeWarpRates.rateFmt(rates.Rates[i])));
+                        }
+                    }
+#if false
                     rateNode.AddValue("warpRate1", rates.Rates[1]);
                     rateNode.AddValue("warpRate2", rates.Rates[2]);
                     rateNode.AddValue("warpRate3", rates.Rates[3]);
@@ -855,6 +1013,7 @@ namespace BetterTimeWarp
                         rateNode.AddValue("warpRate6", rates.Rates[6]);
                         rateNode.AddValue("warpRate7", rates.Rates[7]);
                     }
+#endif
                     rateNode.AddValue("physics", rates.Physics);
                     node.AddNode(rateNode);
                 }

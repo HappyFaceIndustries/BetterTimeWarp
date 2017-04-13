@@ -14,7 +14,7 @@ namespace BetterTimeWarp
         private static readonly String CONFIG_BASE_FOLDER = ROOT_PATH + "GameData/";
         private static String BTW_BASE_FOLDER = CONFIG_BASE_FOLDER + "BetterTimeWarp/";
         private static String BTW_CFG_FILE = BTW_BASE_FOLDER + "PluginData/BetterTimeWarp.cfg";
-
+        private static String BTW_DEFAULT_CFG_FILE = BTW_BASE_FOLDER + "PluginData/BetterTimeWarp_Defaults.cfg";
 
         static bool started = false;
 		public void Start()
@@ -24,8 +24,17 @@ namespace BetterTimeWarp
 			{
 				DontDestroyOnLoad (this);
                 ConfigNode node;
-				//load the settings
-				BetterTimeWarp.SettingsNode = ConfigNode.Load (BTW_CFG_FILE);
+                //load the settings
+                if (System.IO.File.Exists(KSPUtil.ApplicationRootPath + BTW_CFG_FILE))
+                { 
+
+                    BetterTimeWarp.SettingsNode = ConfigNode.Load(BTW_CFG_FILE);
+                    Log.Info("Config loaded");
+                } else
+                {
+                    BetterTimeWarp.SettingsNode = ConfigNode.Load(BTW_DEFAULT_CFG_FILE);
+                    Log.Info("Default configs loaded");
+                }
 
                 //if the settings are not found, regenerate them
                 if (BetterTimeWarp.SettingsNode == null)
