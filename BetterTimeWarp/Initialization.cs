@@ -13,7 +13,7 @@ namespace BetterTimeWarp
         public static readonly String ROOT_PATH = KSPUtil.ApplicationRootPath;
         private static readonly String CONFIG_BASE_FOLDER = ROOT_PATH + "GameData/";
         private static String BTW_BASE_FOLDER = CONFIG_BASE_FOLDER + "BetterTimeWarp/";
-        private static String BTW_CFG_FILE = BTW_BASE_FOLDER + "PluginData/BetterTimeWarp.cfg";
+        public static String BTW_CFG_FILE = BTW_BASE_FOLDER + "PluginData/BetterTimeWarp.cfg";
         private static String BTW_DEFAULT_CFG_FILE = BTW_BASE_FOLDER + "PluginData/BetterTimeWarp_Defaults.cfg";
 
         static bool started = false;
@@ -25,7 +25,8 @@ namespace BetterTimeWarp
 				DontDestroyOnLoad (this);
                 ConfigNode node;
                 //load the settings
-                if (System.IO.File.Exists(KSPUtil.ApplicationRootPath + BTW_CFG_FILE))
+                Log.Info("Cfg file: " + BTW_CFG_FILE);
+                if (System.IO.File.Exists(BTW_CFG_FILE))
                 { 
 
                     BetterTimeWarp.SettingsNode = ConfigNode.Load(BTW_CFG_FILE);
@@ -44,17 +45,7 @@ namespace BetterTimeWarp
                     BetterTimeWarp.SettingsNode.AddNode("BetterTimeWarp");
                 
                 node = BetterTimeWarp.SettingsNode.GetNode("BetterTimeWarp");
-                //if (!node.HasValue ("enabled"))
-                //	node.AddValue ("enabled", "true");
 
-
-//if enabled = false is in the config, disable the mod
-//bool isEnabled = true;
-//if (bool.TryParse (node.GetValue ("enabled"), out isEnabled))
-//{
-//	BetterTimeWarp.isEnabled = isEnabled;
-//}
-//if (!isEnabled)
 #if false
                 if (!HighLogic.CurrentGame.Parameters.CustomParams<BTWCustomParams>().enabled)
 				{

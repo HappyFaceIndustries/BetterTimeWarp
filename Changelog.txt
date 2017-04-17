@@ -67,3 +67,6 @@
 	Added code to deal with someone turning on a ResourceConverter while in warp
 	Changed code from being started every scene to only being started at the spacecenter, and set not to destroy
 	Renamed config file in release to defaults, will not overwrite existing configs after this release
+
+2.3.7.4
+	Fixed mod not saving custom values

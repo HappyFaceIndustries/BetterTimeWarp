@@ -640,6 +640,8 @@ namespace BetterTimeWarp
                                                 });
                         PopupDialog.SpawnPopupDialog(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), dialog, false, HighLogic.UISkin, true);
                     }
+                    //save the settings, so if they have been regenerated, it exsists and wont cause errors
+                    BetterTimeWarp.SettingsNode.Save(BetterTimeWarpInitializer.BTW_CFG_FILE);
                 }
                 if (GUILayout.Button("Cancel", smallButtonStyle))
                 {
