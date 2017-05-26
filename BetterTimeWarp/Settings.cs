@@ -16,6 +16,7 @@ namespace BetterTimeWarp
         public override string Title { get { return "Better Time Warp"; } }
         public override GameParameters.GameMode GameMode { get { return GameParameters.GameMode.ANY; } }
         public override string Section { get { return "Better Time Warp"; } }
+        public override string DisplaySection { get { return "Better Time Warp"; } }
         public override int SectionOrder { get { return 1; } }
         public override bool HasPresets { get { return true; } }
 

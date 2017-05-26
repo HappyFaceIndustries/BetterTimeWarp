@@ -635,7 +635,7 @@ namespace BetterTimeWarp
                     else
                     {
                         //PopupDialog.SpawnPopupDialog (new MultiOptionDialog("Cannot save because there are non-numbers in the editing fields", "Error", null), false, null);
-                        var dialog = new MultiOptionDialog("Cannot save because there are non-numbers in the editing fields", "Error", HighLogic.UISkin, new DialogGUIBase[] {
+                        var dialog = new MultiOptionDialog("btw1", "Cannot save because there are non-numbers in the editing fields", "Error", HighLogic.UISkin, new DialogGUIBase[] {
                                                                                      new DialogGUIButton ("OK", () => { })
                                                 });
                         PopupDialog.SpawnPopupDialog(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), dialog, false, HighLogic.UISkin, true);
@@ -727,7 +727,7 @@ namespace BetterTimeWarp
                     {
                         //PopupDialog.SpawnPopupDialog (new MultiOptionDialog("Cannot edit standard warp rates", "Better Time Warp", null), true, null);
 
-                        var dialog = new MultiOptionDialog("Cannot edit standard warp rates", "Better Time Warp", HighLogic.UISkin, new DialogGUIBase[] {
+                        var dialog = new MultiOptionDialog("btw2", "Cannot edit standard warp rates", "Better Time Warp", HighLogic.UISkin, new DialogGUIBase[] {
                                                                                      new DialogGUIButton ("OK", () => { })
                                                 });
                         PopupDialog.SpawnPopupDialog(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), dialog, false, HighLogic.UISkin, true);
@@ -745,7 +745,7 @@ namespace BetterTimeWarp
 
 
 
-                        var dialog = new MultiOptionDialog("Deleted " + currentRates.Name + " time warp rates", "Better Time Warp", HighLogic.UISkin, new DialogGUIBase[] {
+                        var dialog = new MultiOptionDialog("btw3", "Deleted " + currentRates.Name + " time warp rates", "Better Time Warp", HighLogic.UISkin, new DialogGUIBase[] {
                                                                                      new DialogGUIButton ("OK", () => { 
                                                            // winState = winContent.close;
                                                         })
@@ -762,7 +762,7 @@ namespace BetterTimeWarp
                     {
                         //PopupDialog.SpawnPopupDialog (new MultiOptionDialog("Cannot delete standard warp rates", "Better Time Warp", null), true, null);
 
-                        var dialog = new MultiOptionDialog("Cannot delete standard warp rates", "Better Time Warp", HighLogic.UISkin, new DialogGUIBase[] {
+                        var dialog = new MultiOptionDialog("btw4", "Cannot delete standard warp rates", "Better Time Warp", HighLogic.UISkin, new DialogGUIBase[] {
                                                                                      new DialogGUIButton ("OK", () => { })
                                                 });
                         PopupDialog.SpawnPopupDialog(new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), dialog, false, HighLogic.UISkin, true);
