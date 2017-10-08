@@ -70,3 +70,8 @@
 
 2.3.7.4
 	Fixed mod not saving custom values
+
+2.3.8
+	updated for 1.3
+	Updated dialog calls for new 1.3 parameter
+	Added DisplaySection function, will need to localize it
