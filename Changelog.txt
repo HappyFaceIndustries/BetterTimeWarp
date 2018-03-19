@@ -81,3 +81,8 @@
 
 2.3.9.1
 	Updated build scripts
+
+2.3.10
+	updated for 1.4.1
+	Added support for ToolbarControl
+	Added support for ClickThroughBlocker

@@ -24,6 +24,10 @@ namespace BetterTimeWarp
             toolTip ="Changing this requires restarting the game")]
         public bool enabled = true;
 
+
+        [GameParameters.CustomParameterUI("Use Blizzy Toolbar if available")]
+        public bool useBlizzy = false;
+
         [GameParameters.CustomParameterUI("Always hide the button?")]
         public bool hideButton = false;
 

@@ -7,13 +7,15 @@ using KSP.UI.Screens;
 using KSP.UI.Screens.Flight;
 
 using System.Reflection;
+using ClickThroughFix;
+using ToolbarControl_NS;
 
 //using NearFutureElectrical;
 
 namespace BetterTimeWarp
 {
 
-//    [KSPAddon(KSPAddon.Startup.EveryScene, false)]
+    //    [KSPAddon(KSPAddon.Startup.EveryScene, false)]
     [KSPAddon(KSPAddon.Startup.SpaceCentre, true)]
     public class BetterTimeWarp : MonoBehaviour
     {
@@ -37,14 +39,16 @@ namespace BetterTimeWarp
                 windowOpen = value;
             }
         }
-        public ApplicationLauncherButton Button;
+       // public ApplicationLauncherButton Button;
+        ToolbarControl toolbarControl;
+
         private bool hasAdded = false;
 
         static Texture2D upArrow;
         static Texture2D downArrow;
 
         static bool buttonTexLoaded = false;
-        static Texture2D buttonTexture;
+        //static Texture2D buttonTexture;
 
         public void Start()
         {
@@ -88,34 +92,54 @@ namespace BetterTimeWarp
             GameEvents.onPartUnpack.Add(onPartUnpack);
             GameEvents.onLevelWasLoadedGUIReady.Add(onLevelWasLoadedGUIReady);
 
+#if false
             if (!buttonTexLoaded)
             {
                 buttonTexLoaded = true;
                 buttonTexture = GameDatabase.Instance.GetTexture("BetterTimeWarp/Icons/application", false);
             }
-
+#endif
             //add the toolbar button to non-flight scenes
             if (!hasAdded && HighLogic.CurrentGame.Parameters.CustomParams<BTWCustomParams>().enabled && !HighLogic.CurrentGame.Parameters.CustomParams<BTWCustomParams>().hideButton)
             {
                 if (!HighLogic.CurrentGame.Parameters.CustomParams<BTWCustomParams>().hideButtonInFlight || HighLogic.LoadedScene != GameScenes.FLIGHT)
                 {
+#if false
                     Button = KSP.UI.Screens.ApplicationLauncher.Instance.AddModApplication(
-                    new Callback(delegate
-                        {
-                            UIOpen = true;
-                        }),
-                    new Callback(delegate
-                        {
-                            UIOpen = false;
-                        }),
-                    null, null, null, null, ApplicationLauncher.AppScenes.SPACECENTER | ApplicationLauncher.AppScenes.TRACKSTATION | ApplicationLauncher.AppScenes.FLIGHT | ApplicationLauncher.AppScenes.MAPVIEW, buttonTexture
-                );
+                        OnTrue,
+                        OnFalse,
+                        null, null, null, null, 
+                        ApplicationLauncher.AppScenes.SPACECENTER | ApplicationLauncher.AppScenes.TRACKSTATION | 
+                        ApplicationLauncher.AppScenes.FLIGHT | ApplicationLauncher.AppScenes.MAPVIEW, 
+                        buttonTexture
+                    );
                     KSP.UI.Screens.ApplicationLauncher.Instance.EnableMutuallyExclusive(Button);
+#endif
+                    toolbarControl = gameObject.AddComponent<ToolbarControl>();
+                    toolbarControl.AddToAllToolbars(OnTrue, OnFalse,
+                        ApplicationLauncher.AppScenes.SPACECENTER | ApplicationLauncher.AppScenes.TRACKSTATION |
+                        ApplicationLauncher.AppScenes.FLIGHT | ApplicationLauncher.AppScenes.MAPVIEW,
+                        "BetterTimeWarp_NS",
+                        "betterTimeWarpButton",
+                        "BetterTimeWarp/Icons/application_38",
+                        "BetterTimeWarp/Icons/application_24",
+                        "Better Time Warp"
+                    );
+                    toolbarControl.UseBlizzy(HighLogic.CurrentGame.Parameters.CustomParams<BTWCustomParams>().useBlizzy);
+
                     hasAdded = true;
                 }
             }
         }
 
+        void OnTrue()
+        {
+            UIOpen = true;
+        }
+        void OnFalse()
+        {
+            UIOpen = false;
+        }
         void onLevelWasLoadedGUIReady(GameScenes scene)
         {
             CreateRectangles();
@@ -126,7 +150,7 @@ namespace BetterTimeWarp
             {
                 SetWarpRates(warpRates[currWarpIndex]);
             }
-           // if (physRates[currPhysIndex] != CurrentPhysWarp)
+            // if (physRates[currPhysIndex] != CurrentPhysWarp)
             {
                 SetWarpRates(physRates[currPhysIndex]);
             }
@@ -149,11 +173,15 @@ namespace BetterTimeWarp
 
         public void removeLauncherButtons()
         {
+#if false
             if (Button != null)
             {
                 ApplicationLauncher.Instance.RemoveModApplication(Button);
                 Button = null;
             }
+#endif
+            toolbarControl.OnDestroy();
+            Destroy(toolbarControl);
         }
 
         void InitW()
@@ -190,7 +218,7 @@ namespace BetterTimeWarp
                         case "ModuleResourceConverter":
                             ModuleResourceConverter tmpGen = (ModuleResourceConverter)tmpPM;
                             Log.Info("Module: " + tmpGen.moduleName + " IsActivated: " + tmpGen.IsActivated.ToString());
-                           // if (!tmpGen.IsActivated)
+                            // if (!tmpGen.IsActivated)
                             {
                                 FieldInfo fi = tmpGen.GetType().GetField("lastUpdateTime", BindingFlags.NonPublic | BindingFlags.Instance);
                                 if (fi != null)
@@ -209,7 +237,7 @@ namespace BetterTimeWarp
             }
         }
 
-        
+
         static int lastWarpRateIdx = 0;
         void onTimeWarpRateChanged()
         {
@@ -260,11 +288,11 @@ namespace BetterTimeWarp
                                 }
                             }
                         }
-                    }                    
+                    }
                 }
-               
+
                 lastWarpRateIdx = TimeWarp.fetch.current_rate_index;
-               
+
             }
         }
 
@@ -307,6 +335,9 @@ namespace BetterTimeWarp
 
         public void OnGUI()
         {
+            if (toolbarControl != null)
+                toolbarControl.UseBlizzy(HighLogic.CurrentGame.Parameters.CustomParams<BTWCustomParams>().useBlizzy);
+
             if (HighLogic.LoadedScene <= GameScenes.CREDITS)
                 return;
             if (HighLogic.LoadedScene != GameScenes.SPACECENTER &&
@@ -358,22 +389,22 @@ namespace BetterTimeWarp
                         {
                             windowOpen = b;
 
-                           // CreateRectangles();
+                            // CreateRectangles();
                         }
-                        
+
                     }
                 }
 
                 if (windowOpen)
                 {
                     if (!advWindowOpen)
-                        quikWindowRect = GUILayout.Window(60371, quikWindowRect, QuikWarpWindow, "", windowStyle);
+                        quikWindowRect = ClickThruBlocker.GUILayoutWindow(60371, quikWindowRect, QuikWarpWindow, "", windowStyle);
                     else
                     {
-                        advWindowRect = GUILayout.Window(60372, advWindowRect, TimeWarpWindow, "", windowStyle);
+                        advWindowRect = ClickThruBlocker.GUILayoutWindow(60372, advWindowRect, TimeWarpWindow, "", windowStyle);
                         if (showPhysicsSettings)
                         {
-                            physSettingsRect = GUILayout.Window(60373, physSettingsRect, PhysicsSettingsWindow, "", windowStyle);
+                            physSettingsRect = ClickThruBlocker.GUILayoutWindow(60373, physSettingsRect, PhysicsSettingsWindow, "", windowStyle);
                         }
                     }
 
@@ -704,7 +735,7 @@ namespace BetterTimeWarp
                         warpName = currentRates.Name;
                         physics = currentRates.Physics;
 
-                        for (int i = 1; i < 8; i ++)
+                        for (int i = 1; i < 8; i++)
                         {
                             if (i < 4 || !physics)
                                 w[i] = currentRates.Rates[i].ToString(TimeWarpRates.rateFmt(currentRates.Rates[i]));
@@ -962,7 +993,7 @@ namespace BetterTimeWarp
             //load selected rates
             string currentTimeWarp = StandardWarp.Name;
             string currentPhysWarp = StandardPhysWarp.Name;
-            
+
             if (node.HasValue("CurrentTimeWarp"))
                 currentTimeWarp = node.GetValue("CurrentTimeWarp");
             if (node.HasValue("CurrentPhysWarp"))
@@ -997,7 +1028,7 @@ namespace BetterTimeWarp
                 {
                     ConfigNode rateNode = new ConfigNode("CustomWarpRate");
                     rateNode.AddValue("name", rates.Name);
-                    for (int i = 1; i < 8; i ++)
+                    for (int i = 1; i < 8; i++)
                     {
                         if (i < 4 || !rates.Physics)
                         {
