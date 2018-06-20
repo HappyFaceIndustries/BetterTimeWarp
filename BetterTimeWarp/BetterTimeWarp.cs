@@ -14,7 +14,14 @@ using ToolbarControl_NS;
 
 namespace BetterTimeWarp
 {
-
+    [KSPAddon(KSPAddon.Startup.MainMenu, true)]
+    public class RegisterToolbar : MonoBehaviour
+    {
+        void Start()
+        {
+            ToolbarControl.RegisterMod(BetterTimeWarp.MODID, BetterTimeWarp.MODNAME);
+        }
+    }
     //    [KSPAddon(KSPAddon.Startup.EveryScene, false)]
     [KSPAddon(KSPAddon.Startup.SpaceCentre, true)]
     public class BetterTimeWarp : MonoBehaviour
@@ -92,45 +99,31 @@ namespace BetterTimeWarp
             GameEvents.onPartUnpack.Add(onPartUnpack);
             GameEvents.onLevelWasLoadedGUIReady.Add(onLevelWasLoadedGUIReady);
 
-#if false
-            if (!buttonTexLoaded)
-            {
-                buttonTexLoaded = true;
-                buttonTexture = GameDatabase.Instance.GetTexture("BetterTimeWarp/Icons/application", false);
-            }
-#endif
+
             //add the toolbar button to non-flight scenes
             if (!hasAdded && HighLogic.CurrentGame.Parameters.CustomParams<BTWCustomParams>().enabled && !HighLogic.CurrentGame.Parameters.CustomParams<BTWCustomParams>().hideButton)
             {
                 if (!HighLogic.CurrentGame.Parameters.CustomParams<BTWCustomParams>().hideButtonInFlight || HighLogic.LoadedScene != GameScenes.FLIGHT)
                 {
-#if false
-                    Button = KSP.UI.Screens.ApplicationLauncher.Instance.AddModApplication(
-                        OnTrue,
-                        OnFalse,
-                        null, null, null, null, 
-                        ApplicationLauncher.AppScenes.SPACECENTER | ApplicationLauncher.AppScenes.TRACKSTATION | 
-                        ApplicationLauncher.AppScenes.FLIGHT | ApplicationLauncher.AppScenes.MAPVIEW, 
-                        buttonTexture
-                    );
-                    KSP.UI.Screens.ApplicationLauncher.Instance.EnableMutuallyExclusive(Button);
-#endif
+
                     toolbarControl = gameObject.AddComponent<ToolbarControl>();
                     toolbarControl.AddToAllToolbars(OnTrue, OnFalse,
                         ApplicationLauncher.AppScenes.SPACECENTER | ApplicationLauncher.AppScenes.TRACKSTATION |
                         ApplicationLauncher.AppScenes.FLIGHT | ApplicationLauncher.AppScenes.MAPVIEW,
-                        "BetterTimeWarp_NS",
+                        MODID,
                         "betterTimeWarpButton",
                         "BetterTimeWarp/Icons/application_38",
                         "BetterTimeWarp/Icons/application_24",
-                        "Better Time Warp"
+                        MODNAME
                     );
-                    toolbarControl.UseBlizzy(HighLogic.CurrentGame.Parameters.CustomParams<BTWCustomParams>().useBlizzy);
 
                     hasAdded = true;
                 }
             }
         }
+
+        internal const string MODID = "BetterTimeWarp_NS";
+        internal const string MODNAME = "Better Time Warp";
 
         void OnTrue()
         {
@@ -173,13 +166,6 @@ namespace BetterTimeWarp
 
         public void removeLauncherButtons()
         {
-#if false
-            if (Button != null)
-            {
-                ApplicationLauncher.Instance.RemoveModApplication(Button);
-                Button = null;
-            }
-#endif
             toolbarControl.OnDestroy();
             Destroy(toolbarControl);
         }
@@ -335,8 +321,6 @@ namespace BetterTimeWarp
 
         public void OnGUI()
         {
-            if (toolbarControl != null)
-                toolbarControl.UseBlizzy(HighLogic.CurrentGame.Parameters.CustomParams<BTWCustomParams>().useBlizzy);
 
             if (HighLogic.LoadedScene <= GameScenes.CREDITS)
                 return;

@@ -86,3 +86,8 @@
 	updated for 1.4.1
 	Added support for ToolbarControl
 	Added support for ClickThroughBlocker
+
+2.3.10.1
+	Updated for all 1.4
+	Updated to use updated ToolbarControl
+	Removed blizzy options
