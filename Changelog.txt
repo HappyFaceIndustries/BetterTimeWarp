@@ -91,3 +91,6 @@
 	Updated for all 1.4
 	Updated to use updated ToolbarControl
 	Removed blizzy options
+
+2.3.10.2
+	Version bump for 1.5 rebuild
