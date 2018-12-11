@@ -94,3 +94,7 @@
 
 2.3.10.2
 	Version bump for 1.5 rebuild
+
+2.3.11
+	Bug fix for lossless physics causing issues, both after warp is done and while warp was in progress
+	Removed max version from .version file

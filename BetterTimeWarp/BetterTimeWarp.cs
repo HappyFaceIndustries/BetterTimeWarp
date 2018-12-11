@@ -229,7 +229,8 @@ namespace BetterTimeWarp
         {
             if (TimeWarp.fetch != null)
             {
-                //Log.Info("TimeWarp.fetch.current_rate_index: " + TimeWarp.fetch.current_rate_index.ToString() + "    New time warp: " + TimeWarp.fetch.warpRates[TimeWarp.fetch.current_rate_index].ToString() + "    lastWarpRate: " + lastWarpRate.ToString());
+                Log.Info("TimeWarp.fetch.current_rate_index: " + TimeWarp.fetch.current_rate_index.ToString());
+                Log.Info("TimeWarp.Mode: " + TimeWarp.fetch.Mode.ToString());
 
                 if (lastWarpRateIdx > 0 && TimeWarp.fetch.warpRates[TimeWarp.fetch.current_rate_index] > 1)
                 {
@@ -825,6 +826,7 @@ namespace BetterTimeWarp
 
             GUILayout.Label("<b>Physics Timestep:</b> <color=white>" + Time.fixedDeltaTime + "s</color>");
             GUILayout.Label("<b>Physics Timescale:</b> <color=white>" + Time.timeScale + "x</color>");
+            GUILayout.Label("<b>Lossless Upper Threshold:</b> <color=white>" + LosslessUpperThreshold.ToString("N3") + "x</color>");
 
             GUILayout.EndScrollView();
             if (!lockWindow())
@@ -833,13 +835,39 @@ namespace BetterTimeWarp
 
         void FixedUpdate()
         {
-            if (UseLosslessPhysics && Time.timeScale < 100f)
+            if (TimeWarp.fetch.Mode == TimeWarp.Modes.HIGH && UseLosslessPhysics && Time.timeScale < 100f)
             {
-                if (Time.timeScale >= LosslessUpperThreshold)
+                if (Time.timeScale == 1f)
                 {
-                    Time.fixedDeltaTime = LosslessUpperThreshold * 0.02f;
+                    Time.fixedDeltaTime = 0.02f;
+
+                    //ScreenMessages.PostScreenMessage("1 Setting Time.fixedDeltaTime to " + Time.fixedDeltaTime.ToString("N4"), 5);
                     Planetarium.fetch.fixedDeltaTime = Time.fixedDeltaTime;
+                    Time.maximumDeltaTime = GameSettings.PHYSICS_FRAME_DT_LIMIT;
+
                 }
+                else
+                {
+                    if (Time.timeScale >= LosslessUpperThreshold)
+                    {
+                        Time.fixedDeltaTime = LosslessUpperThreshold * 0.02f;
+                        //ScreenMessages.PostScreenMessage("2 Setting Time.fixedDeltaTime to " + Time.fixedDeltaTime.ToString("N4"), 5);
+                        Planetarium.fetch.fixedDeltaTime = Time.fixedDeltaTime;
+                        Time.maximumDeltaTime = Time.fixedDeltaTime;
+                    }
+                    else
+                    {
+                        Time.fixedDeltaTime = Time.timeScale * 0.02f;
+                        //ScreenMessages.PostScreenMessage("3 Setting Time.fixedDeltaTime to " + Time.fixedDeltaTime.ToString("N4"), 5);
+
+                        Planetarium.fetch.fixedDeltaTime = Time.fixedDeltaTime;
+                        Time.maximumDeltaTime = Time.fixedDeltaTime;
+                    }
+                }
+
+                float v = Mathf.Clamp((Mathf.Round(Time.fixedDeltaTime * 100f) / 100f), 0.02f, 0.35f);
+                GameSettings.PHYSICS_FRAME_DT_LIMIT = v;
+                GameSettings.SaveSettings();
             }
         }
 
