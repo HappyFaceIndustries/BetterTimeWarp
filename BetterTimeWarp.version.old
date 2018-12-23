@@ -1,10 +1,11 @@
 {
   "NAME": "BetterTimeWarpContinued",
   "URL": "http://ksp.spacetux.net/avc/BetterTimeWarp",
-  "DOWNLOAD": "https://github.com/linuxgurugamer/BetterTimeWarpContinued/releases",
-  "GITHUB": {
-    "USERNAME": "linuxgurugamer",
-    "REPOSITORY": "BetterTimeWarpContinued"
+  "DOWNLOAD" : "https://github.com/linuxgurugamer/BetterTimeWarpContinued/releases",
+  "GITHUB" :
+  {
+      "USERNAME" : "linuxgurugamer",
+      "REPOSITORY" : "BetterTimeWarpContinued"
   },
   "VERSION": {
     "MAJOR": 2,
