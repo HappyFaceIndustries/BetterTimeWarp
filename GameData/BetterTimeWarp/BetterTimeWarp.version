@@ -1,17 +1,16 @@
 {
   "NAME": "BetterTimeWarpContinued",
   "URL": "http://ksp.spacetux.net/avc/BetterTimeWarp",
-  "DOWNLOAD" : "https://github.com/linuxgurugamer/BetterTimeWarpContinued/releases",
-  "GITHUB" :
-  {
-      "USERNAME" : "linuxgurugamer",
-      "REPOSITORY" : "BetterTimeWarpContinued"
+  "DOWNLOAD": "https://github.com/linuxgurugamer/BetterTimeWarpContinued/releases",
+  "GITHUB": {
+    "USERNAME": "linuxgurugamer",
+    "REPOSITORY": "BetterTimeWarpContinued"
   },
   "VERSION": {
     "MAJOR": 2,
     "MINOR": 3,
     "PATCH": 11,
-    "BUILD": 1
+    "BUILD": 3
   },
   "KSP_VERSION": {
     "MAJOR": 1,

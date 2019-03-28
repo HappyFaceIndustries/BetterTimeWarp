@@ -101,3 +101,6 @@
 
 2.3.11.1
 	Fixed stupid bug which caused nullrefs in the editor
+
+2.3.11.3
+	Fixed log spam caused when saving game settings

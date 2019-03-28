@@ -866,11 +866,14 @@ namespace BetterTimeWarp
                 }
 
                 float v = Mathf.Clamp((Mathf.Round(Time.fixedDeltaTime * 100f) / 100f), 0.02f, 0.35f);
-                GameSettings.PHYSICS_FRAME_DT_LIMIT = v;
-                GameSettings.SaveSettings();
+                if (v != GameSettings.PHYSICS_FRAME_DT_LIMIT)
+                {
+                    GameSettings.PHYSICS_FRAME_DT_LIMIT = v;
+                    GameSettings.SaveSettings();
+                }
             }
         }
-
+        
         public void SetWarpRates(TimeWarpRates rates, bool message = true)
         {
             if (TimeWarp.fetch != null)
