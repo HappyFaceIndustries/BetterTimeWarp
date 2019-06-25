@@ -104,3 +104,6 @@
 
 2.3.11.3
 	Fixed log spam caused when saving game settings
+
+2.3.11.4
+	Version bump for 1.7.2
