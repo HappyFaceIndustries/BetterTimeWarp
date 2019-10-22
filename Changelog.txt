@@ -107,3 +107,8 @@
 
 2.3.11.4
 	Version bump for 1.7.2
+
+2.3.12
+	Added InstallChecker
+	Updated AssemblyVersion.tt
+	Rebuild for 1.8
