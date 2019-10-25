@@ -112,3 +112,6 @@
 	Added InstallChecker
 	Updated AssemblyVersion.tt
 	Rebuild for 1.8
+
+2.3.12.1
+	Updated MiniAVC to 1.4.0
