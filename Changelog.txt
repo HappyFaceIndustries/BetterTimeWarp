@@ -122,6 +122,6 @@
 2.3.12.3
 	Really did the MiniAVC update
 
-2.3.11.6 for KSP 1.6.1-1.7.3
+2.3.11.7 for KSP 1.6.1-1.7.3
 2.3.12.4 for KSP 1.8+
 	Fixed issue with selected timewarp being reset upon scene change
