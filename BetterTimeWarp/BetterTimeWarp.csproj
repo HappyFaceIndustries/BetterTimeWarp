@@ -40,10 +40,10 @@
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="AssemblyVersion.cs">
+    <Compile Include="AssemblyVersion.18.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>AssemblyVersion.tt</DependentUpon>
+      <DependentUpon>AssemblyVersion.18.tt</DependentUpon>
     </Compile>
     <Compile Include="InstallChecker.cs" />
     <Compile Include="Log.cs" />
@@ -52,12 +52,6 @@
     <Compile Include="Initialization.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="TimeWarpRates.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="AssemblyVersion.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>AssemblyVersion.cs</LastGenOutput>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
@@ -79,12 +73,20 @@
       <HintPath>$(KSPDIR)\GameData\001_ToolbarControl\Plugins\ToolbarControl.dll</HintPath>
     </Reference>
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="AssemblyVersion.18.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>AssemblyVersion.18.cs</LastGenOutput>
+    </Content>
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>
 set textTemplatingPath="%25ProgramFiles(x86)%25\Microsoft Visual Studio\2017\Community\Common7\IDE\texttransform.exe"
 
-%25textTemplatingPath%25 "$(ProjectDir)AssemblyVersion.tt"
+
+
+%25textTemplatingPath%25 "$(ProjectDir)AssemblyVersion.18.tt"
 </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>

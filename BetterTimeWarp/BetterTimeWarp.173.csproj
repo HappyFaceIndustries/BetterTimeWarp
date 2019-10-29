@@ -38,10 +38,10 @@
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="AssemblyVersion.cs">
+    <Compile Include="AssemblyVersion.173.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>AssemblyVersion.tt</DependentUpon>
+      <DependentUpon>AssemblyVersion.173.tt</DependentUpon>
     </Compile>
     <Compile Include="Log.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -51,9 +51,9 @@
     <Compile Include="TimeWarpRates.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="AssemblyVersion.tt">
+    <Content Include="AssemblyVersion.173.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>AssemblyVersion.cs</LastGenOutput>
+      <LastGenOutput>AssemblyVersion.173.cs</LastGenOutput>
     </Content>
   </ItemGroup>
   <ItemGroup>
@@ -88,7 +88,7 @@ set textTemplatingPath="%25ProgramFiles(x86)%25\Microsoft Visual Studio\2017\Com
 
 
 
-%25textTemplatingPath%25 "$(ProjectDir)AssemblyVersion.tt"
+%25textTemplatingPath%25 "$(ProjectDir)AssemblyVersion.173.tt"
 </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
