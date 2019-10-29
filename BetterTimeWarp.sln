@@ -16,7 +16,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		jenkins-180.txt = jenkins-180.txt
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BetterTimeWarp-173", "BetterTimeWarp\BetterTimeWarp-173.csproj", "{62D14DDB-989F-4A68-B0E1-116205567669}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BetterTimeWarp-1.7.3", "BetterTimeWarp\BetterTimeWarp-1.7.3.csproj", "{62D14DDB-989F-4A68-B0E1-116205567669}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

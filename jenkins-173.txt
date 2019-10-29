@@ -27,7 +27,7 @@
 1:BetterTimeWarp, BetterTimeWarp.173.version
 
 # 2:PROJNAME, PROJFILE, VERSIONFILE, PLUGINSFOLDER
-2:BetterTimeWarp,BetterTimeWarp/BetterTimeWarp-173.csproj,BetterTimeWarp.173.version,GameData/BetterTimeWarp/Plugins
+2:BetterTimeWarp,BetterTimeWarp/BetterTimeWarp-1.7.3.csproj,BetterTimeWarp.173.version,GameData/BetterTimeWarp/Plugins
 
 # 3:SOURCEFILE, DESTDIR
 3:BetterTimeWarp.173.version,GameData/BetterTimeWarp
