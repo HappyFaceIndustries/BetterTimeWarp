@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26730.8
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BetterTimeWarp", "BetterTimeWarp\BetterTimeWarp.csproj", "{4B05E220-5E03-4B86-8896-B407D71F6A99}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BetterTimeWarp-1.8", "BetterTimeWarp\BetterTimeWarp-1.8.csproj", "{4B05E220-5E03-4B86-8896-B407D71F6A99}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{EED9A79F-353B-4B90-82CC-5993F6309EB2}"
 	ProjectSection(SolutionItems) = preProject
@@ -16,7 +16,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		jenkins.180.txt = jenkins.180.txt
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BetterTimeWarp.173", "BetterTimeWarp\BetterTimeWarp.173.csproj", "{62D14DDB-989F-4A68-B0E1-116205567669}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BetterTimeWarp-173", "BetterTimeWarp\BetterTimeWarp-173.csproj", "{62D14DDB-989F-4A68-B0E1-116205567669}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
