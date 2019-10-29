@@ -21,7 +21,7 @@
 #
 
 # 0:KSPVersion
-0:1.7.3
+#0:1.7.3
 
 # 1:GAMEDIR, VERSIONFILE [, GITHUBREPO ]
 1:BetterTimeWarp, BetterTimeWarp.180.version
