@@ -53,10 +53,7 @@ namespace BetterTimeWarp
 
         static Texture2D upArrow;
         static Texture2D downArrow;
-
-        static bool buttonTexLoaded = false;
-        //static Texture2D buttonTexture;
-
+        
         public void Start()
         {
             DontDestroyOnLoad(this);
@@ -64,8 +61,7 @@ namespace BetterTimeWarp
                 HighLogic.LoadedScene != GameScenes.FLIGHT &&
                 HighLogic.LoadedScene != GameScenes.TRACKSTATION)
                 return;
-
-
+            
             this.skin = HighLogic.Skin;
 
             LoadCustomWarpRates();
@@ -229,9 +225,6 @@ namespace BetterTimeWarp
         {
             if (TimeWarp.fetch != null)
             {
-                Log.Info("TimeWarp.fetch.current_rate_index: " + TimeWarp.fetch.current_rate_index.ToString());
-                Log.Info("TimeWarp.Mode: " + TimeWarp.fetch.Mode.ToString());
-
                 if (lastWarpRateIdx > 0 && TimeWarp.fetch.warpRates[TimeWarp.fetch.current_rate_index] > 1)
                 {
                     foreach (var v in FlightGlobals.fetch.vesselsLoaded)
@@ -485,6 +478,7 @@ namespace BetterTimeWarp
             scrollPos = GUILayout.BeginScrollView(scrollPos, false, false, hSmallScrollBar, smallScrollBar);
 
             currWarpIndex = GUILayout.SelectionGrid(currWarpIndex, warpNames.ToArray(), 1, smallButtonStyle);
+            Log.Info("QuikWarpWindow, currWarpIndex: " + currWarpIndex);
             GUILayout.Space(20f);
             currPhysIndex = GUILayout.SelectionGrid(currPhysIndex, physNames.ToArray(), 1, smallButtonStyle);
 
@@ -528,7 +522,7 @@ namespace BetterTimeWarp
             currentRates = customWarps.Find(r => r.Name == names[selected] ||
                 (names[selected].Contains("<") && names[selected].Split('<', '>')[2] == r.Name)
                 );
-
+            
             if (currentRates == null)
                 currentRates = StandardWarp;
 
@@ -892,7 +886,7 @@ namespace BetterTimeWarp
                         }
                     }
 
-                    print("[BetterTimeWarp]: Set time warp rates to " + rates.ToString());
+                    Log.Info("Set time warp rates to " + rates.ToString());
                     if (message)
                         ScreenMessages.PostScreenMessage(new ScreenMessage("New time warp rates: " + rates.Name, 3f, ScreenMessageStyle.UPPER_CENTER));
                     return;
@@ -920,6 +914,7 @@ namespace BetterTimeWarp
             }
             Debug.LogWarning("[BetterTimeWarp]: Failed to set warp rates");
 
+#if false
             //reset it to standard in case of  failiure
             if (rates.Physics)
             {
@@ -942,9 +937,11 @@ namespace BetterTimeWarp
                     {
                         currWarpIndex = i;
                         CurrentWarp = StandardWarp;
+                        Log.Info("CurrentWarp set to StandardWarp  1");
                     }
                 }
             }
+#endif
         }
 
         private void LoadCustomWarpRates()
@@ -1020,7 +1017,10 @@ namespace BetterTimeWarp
                 CurrentPhysWarp = physRates.Where(w => w.Name == currentPhysWarp).First();
 
             if (CurrentWarp == null)
+            {
                 CurrentWarp = StandardWarp;
+                Log.Info("CurrentWarp set to StandardWarp  2");
+            }
             if (CurrentPhysWarp == null)
                 CurrentPhysWarp = StandardPhysWarp;
         }
@@ -1068,7 +1068,10 @@ namespace BetterTimeWarp
             }
 
             if (CurrentWarp == null)
+            {
                 CurrentWarp = StandardWarp;
+                Log.Info("CurrentWarp set to StandardWarp  3");
+            }
             if (CurrentPhysWarp == null)
                 CurrentPhysWarp = StandardPhysWarp;
 
