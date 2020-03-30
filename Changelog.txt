@@ -130,3 +130,6 @@
 
 2.3.11.9 for KSP 1.6.1-1.7.3 && 2.3.12.5 for KSP 1.8
 	Fixed initialization of vars to be initialized in Start() rather than the instantiator
+
+2.3.12.6
+	Rebuild and version bump to fix CKAN, dropping builds for 1.7.3
