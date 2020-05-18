@@ -30,7 +30,7 @@
 2:BetterTimeWarp,BetterTimeWarp/BetterTimeWarp-1.8.csproj,BetterTimeWarp.180.version,GameData/BetterTimeWarp/Plugins
 
 # 3:SOURCEFILE, DESTDIR
-3:BetterTimeWarp.180.version,GameData/BetterTimeWarp
+3:BetterTimeWarp.version,GameData/BetterTimeWarp
 #3:LICENSE.md,GameData/KerbalHotSeat
 #3:README.md,GameData/KerbalHotSeat
 
