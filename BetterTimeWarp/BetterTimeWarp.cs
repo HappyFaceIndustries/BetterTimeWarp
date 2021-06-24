@@ -334,7 +334,7 @@ namespace BetterTimeWarp
                 if (HighLogic.LoadedSceneIsFlight && !HighLogic.CurrentGame.Parameters.CustomParams<BTWCustomParams>().hideDropdownButtonInFlight)
                 {
                     const float ICON_WIDTH = 28;
-                    const float ICON_BASE = 203f;
+                    const float ICON_BASE = 203f + 32f; // 32f added for KSP 1.12
 
                     float y = ICON_BASE;
 

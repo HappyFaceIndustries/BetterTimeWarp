@@ -134,5 +134,6 @@
 2.3.12.6
 	Rebuild and version bump to fix CKAN, dropping builds for 1.7.3
 
-2.3.12.?
+2.3.12.7
 	Renamed BetterTimeWarp-1.8.0.version file back to normal : BetterTimeWarp.version
+	Moved dropdown button over 32 pixels for 1.12
