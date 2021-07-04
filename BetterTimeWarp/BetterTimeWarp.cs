@@ -14,15 +14,6 @@ using ToolbarControl_NS;
 
 namespace BetterTimeWarp
 {
-    [KSPAddon(KSPAddon.Startup.MainMenu, true)]
-    public class RegisterToolbar : MonoBehaviour
-    {
-        void Start()
-        {
-            ToolbarControl.RegisterMod(BetterTimeWarp.MODID, BetterTimeWarp.MODNAME);
-        }
-    }
-    //    [KSPAddon(KSPAddon.Startup.EveryScene, false)]
     [KSPAddon(KSPAddon.Startup.SpaceCentre, true)]
     public class BetterTimeWarp : MonoBehaviour
     {
@@ -315,15 +306,10 @@ namespace BetterTimeWarp
 
         public void OnGUI()
         {
-
-            if (HighLogic.LoadedScene <= GameScenes.CREDITS)
-                return;
-            if (HighLogic.LoadedScene != GameScenes.SPACECENTER &&
+            if ((HighLogic.LoadedScene != GameScenes.SPACECENTER &&
                 HighLogic.LoadedScene != GameScenes.FLIGHT &&
                 HighLogic.LoadedScene != GameScenes.TRACKSTATION)
-                return;
-
-            if (!HighLogic.CurrentGame.Parameters.CustomParams<BTWCustomParams>().enabled)
+                || !HighLogic.CurrentGame.Parameters.CustomParams<BTWCustomParams>().enabled)
                 return;
 
             if (ShowUI)
@@ -334,7 +320,7 @@ namespace BetterTimeWarp
                 if (HighLogic.LoadedSceneIsFlight && !HighLogic.CurrentGame.Parameters.CustomParams<BTWCustomParams>().hideDropdownButtonInFlight)
                 {
                     const float ICON_WIDTH = 28;
-                    const float ICON_BASE = 203f + 32f; // 32f added for KSP 1.12
+                    const float ICON_BASE = 203f + 80; // 32f added for KSP 1.12
 
                     float y = ICON_BASE;
 
@@ -357,12 +343,16 @@ namespace BetterTimeWarp
                     if (y == ICON_BASE + ICON_WIDTH)
                         y += 12;
                     float f = 20f;
-                    if (GameSettings.UI_SCALE >= 1)
-                        f *= GameSettings.UI_SCALE;
+                    float scale = 1f;
+                    if (GameSettings.UI_SCALE != 1f || GameSettings.UI_SCALE_TIME != 1f)
+                    {
+                        scale = GameSettings.UI_SCALE * GameSettings.UI_SCALE_TIME;
+                        f *= scale;
+                    }
 
                     if (buttonContent != null)
                     {
-                        var b = GUI.Toggle(new Rect(GameSettings.UI_SCALE * y /* * ScreenSafeUI.PixelRatio */, 0f, f, f), windowOpen, buttonContent, skin.button);
+                        var b = GUI.Toggle(new Rect(scale * y, 0f, f, f), windowOpen, buttonContent, skin.button);
                         if (b != windowOpen)
                         {
                             windowOpen = b;
@@ -478,7 +468,6 @@ namespace BetterTimeWarp
             scrollPos = GUILayout.BeginScrollView(scrollPos, false, false, hSmallScrollBar, smallScrollBar);
 
             currWarpIndex = GUILayout.SelectionGrid(currWarpIndex, warpNames.ToArray(), 1, smallButtonStyle);
-            Log.Info("QuikWarpWindow, currWarpIndex: " + currWarpIndex);
             GUILayout.Space(20f);
             currPhysIndex = GUILayout.SelectionGrid(currPhysIndex, physNames.ToArray(), 1, smallButtonStyle);
 
