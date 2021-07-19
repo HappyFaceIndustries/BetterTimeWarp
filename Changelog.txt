@@ -142,3 +142,6 @@
 	Renamed the 1.8 to normal
 	Moved RegisterToolbar into it's own file
 	Moved drop-down button to the right to avoid a conflict with the new alarm clock
+
+2.3.12.9
+	Added AssemblyFileVersion
