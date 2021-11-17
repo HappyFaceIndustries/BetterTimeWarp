@@ -23,8 +23,8 @@ namespace BetterTimeWarp
         public static string rateFmt(float f)
         {
             
-                if (f < 1f)
-                    return "F";
+                if (f < 1000)
+                    return "";
                 else
                     return "N0";
             
