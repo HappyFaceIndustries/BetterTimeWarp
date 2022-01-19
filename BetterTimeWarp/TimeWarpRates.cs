@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace BetterTimeWarp
@@ -32,13 +33,8 @@ namespace BetterTimeWarp
 
 		public override string ToString ()
 		{
-			string ratesString = "";;
-			foreach (float f in this.Rates)
-			{
-
-				ratesString += f.ToString (rateFmt(f)) + ", ";
-			}
-			ratesString.Remove (ratesString.Length - 3);
+			var rates = Rates.Select(z => z.ToString(rateFmt(z)));
+			String ratesString = String.Join(", ", rates);
 			return this.Name + " - " + ratesString;
 		}
 	}

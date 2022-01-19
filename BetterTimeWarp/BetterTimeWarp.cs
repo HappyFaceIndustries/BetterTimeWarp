@@ -894,14 +894,14 @@ namespace BetterTimeWarp
                         }
                     }
 
-                    print("[BetterTimeWarp]: Set time warp rates to " + rates.ToString());
+                    Log.Info("Set time warp rates to " + rates.ToString());
                     if (message)
                         ScreenMessages.PostScreenMessage(new ScreenMessage("New physic warp rates: " + rates.Name, 3f, ScreenMessageStyle.UPPER_CENTER));
                     return;
                 }
                 return;
             }
-            Debug.LogWarning("[BetterTimeWarp]: Failed to set warp rates");
+            Log.Warning("Failed to set warp rates");
 
 #if false
             //reset it to standard in case of  failiure

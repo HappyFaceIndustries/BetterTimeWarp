@@ -65,6 +65,7 @@ namespace BetterTimeWarp
 
                 //subscribe to the events so that the settings save and the UI can hide/show
                 GameEvents.onGameStateSaved.Add(SaveSettings);
+                GameEvents.onGameStateLoad.Add(onGameStateLoad);
                 GameEvents.onShowUI.Add(ShowUI);
                 GameEvents.onHideUI.Add(HideUI);
 
@@ -81,6 +82,24 @@ namespace BetterTimeWarp
 
                 started = true;
             }
+        }
+
+        void OnDestroy()
+        {
+            GameEvents.onGameStateSaved.Remove(SaveSettings);
+            GameEvents.onGameStateLoad.Remove(onGameStateLoad);
+            GameEvents.onShowUI.Remove(ShowUI);
+            GameEvents.onHideUI.Remove(HideUI);
+        }
+
+        private void onGameStateLoad(ConfigNode data)
+        {
+            Log.Info("onGameStateLoad: Interval = " + GameSettings.AUTOSAVE_INTERVAL / 60.0 + " min");
+
+            HighLogic.CurrentGame.Parameters.CustomParams<BTWCustomParams2>().StockAutosaveInterval =
+                (int)(GameSettings.AUTOSAVE_INTERVAL / 60.0);
+            HighLogic.CurrentGame.Parameters.CustomParams<BTWCustomParams2>().StockAutosaveShortInterval =
+                (int)GameSettings.AUTOSAVE_SHORT_INTERVAL;
         }
 #if false
         private void OnLevelLoaded(GameScenes scene)
