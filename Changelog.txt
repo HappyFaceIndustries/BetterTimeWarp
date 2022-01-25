@@ -145,3 +145,11 @@
 
 2.3.12.9
 	Added AssemblyFileVersion
+
+2.3.13
+	Thanks to user @yalov for these:
+		new Default Warp Rates
+		Physics Warp 1, 4, 8, 12
+		add AUTOSAVE_INTERVAL and AUTOSAVE_SHORT_INTERVAL to settings
+		fix rounding
+		add new Default CustomWarpRates: Five Warp, Soft Physics Warp, Physics Warp 6-10, Physics Warp 15-30
